@@ -31,7 +31,7 @@
     },
     "dependencies": {
         "async": "^3.2.6",
-        "bs58check": "^4.0.0",
+        "bs58": "^6.0.0",
         "bchaddrjs": "^0.5.2",
         "bignumber.js": "^9.1.2",
         "bitcoinjs-lib": "^6.1.6",
