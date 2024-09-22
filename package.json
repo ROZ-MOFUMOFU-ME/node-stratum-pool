@@ -32,8 +32,8 @@
     "dependencies": {
         "async": "^3.2.6",
         "bchaddrjs": "^0.5.2",
-        "bignum": "^0.13.1",
-        "bitcoinjs-lib": "^5.2.0",
+        "bignumber.js": "^9.1.2",
+        "bitcoinjs-lib": "^6.1.6",
         "multi-hashing": "https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git"
     },
     "engines": {
