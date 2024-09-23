@@ -1,6 +1,7 @@
+
 {
     "name": "stratum-pool",
-    "version": "0.2.2",
+    "version": "0.2.1",
     "description": "High performance Stratum poolserver in Node.js",
     "keywords": [
         "stratum",
@@ -32,8 +33,9 @@
     "dependencies": {
         "async": "^3.2.6",
         "base58-native": "^0.1.4",
-        "bitcoinjs-lib": "^6.1.6",
-        "bignumber.js": "^9.1.2",
+        "bchaddrjs": "^0.5.2",
+        "bignum": "^0.13.1",
+        "bitcoinjs-lib": "^5.2.0",
         "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git"
     },
     "engines": {
