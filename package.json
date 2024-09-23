@@ -33,6 +33,7 @@
         "async": "^3.2.6",
         "base58-native": "^0.1.4",
         "bitcoinjs-lib": "^6.1.6",
+        "bignumber.js": "^9.1.2",
         "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git"
     },
     "engines": {
