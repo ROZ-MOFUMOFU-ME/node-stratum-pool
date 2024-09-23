@@ -33,6 +33,7 @@
         "url": "https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git"
     },
     "dependencies": {
+        "@exodus/bitcoinjs-lib-zcash": "^0.0.13",
         "async": "^3.2.6",
         "bignum": "^0.13.1",
         "bitcoinjs-lib": "^7.0.0-rc.0",
