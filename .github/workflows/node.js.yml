@@ -6,7 +6,7 @@ on:
     branches: [ "main", "dev" ]
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x, 22.x]
