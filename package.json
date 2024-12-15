@@ -36,7 +36,7 @@
         "@exodus/bitcoinjs-lib-zcash": "^0.0.14",
         "async": "^3.2.6",
         "bitcoinjs-lib": "^6.1.7",
-        "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git"
+        "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
     },
     "engines": {
         "node": ">=16",
