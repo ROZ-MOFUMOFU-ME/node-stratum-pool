@@ -30,8 +30,8 @@
         "test": "node test.mjs",
         "lint": "eslint lib/ test.mjs",
         "lint:fix": "eslint lib/ test.mjs --fix",
-        "format": "prettier --write lib/ test.mjs",
-        "format:check": "prettier --check lib/ test.mjs"
+        "format": "prettier --write lib/ test.mjs .eslintrc.json .prettierrc",
+        "format:check": "prettier --check lib/ test.mjs .eslintrc.json .prettierrc"
     },
     "repository": {
         "type": "git",
