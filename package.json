@@ -1,6 +1,7 @@
 {
     "name": "stratum-pool",
-    "version": "0.2.9",
+    "version": "0.3.0",
+    "type": "module",
     "description": "High performance Stratum poolserver in Node.js",
     "keywords": [
         "stratum",
@@ -26,7 +27,9 @@
     ],
     "main": "lib/index.js",
     "scripts": {
-        "test": "node lib/test.js"
+        "test": "node test.mjs",
+        "lint": "eslint lib/ test.mjs",
+        "lint:fix": "eslint lib/ test.mjs --fix"
     },
     "repository": {
         "type": "git",
@@ -36,7 +39,10 @@
         "@exodus/bitcoinjs-lib-zcash": "^0.0.14",
         "async": "^3.2.6",
         "bitcoinjs-lib": "^6.1.7",
-        "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
+        "multi-hashing": "https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
+    },
+    "devDependencies": {
+        "eslint": "^8.57.0"
     },
     "engines": {
         "node": ">=16",
