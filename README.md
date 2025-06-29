@@ -1,9 +1,14 @@
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
 pools, each with their own daemon and stratum port :)
 
-[![gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ROZ-MOFUMOFU-ME/zny-nomp)
+[![Lint/Format](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)
 [![GitHub CI](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)
 [![CircleCI](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main.svg?style=svg)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=white)](https://www.javascript.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
+[![Prettier](https://img.shields.io/badge/Code%20Style-Prettier-f7b93e.svg)](https://prettier.io/)
+[![ESLint](https://img.shields.io/badge/Code%20Quality-ESLint-4b32c3.svg)](https://eslint.org/)
+[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://opensource.org/licenses/GPL-2.0)
 
 #### Notice
 
