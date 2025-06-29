@@ -128,10 +128,26 @@ jobs:
             - run:
                   name: Verify build
                   command: echo "Build and Test completed successfully!"
+    test-v24:
+        docker:
+            - image: cimg/base:stable
+        steps:
+            - checkout
+            - node/install:
+                  node-version: '24.3'
+            - run:
+                  name: Run build
+                  command: npm install
+            - run:
+                  name: Run tests
+                  command: npm run test
+            - run:
+                  name: Verify build
+                  command: echo "Build and Test completed successfully!"
 workflows:
     build:
         jobs:
-            - test-v16
             - test-v18
             - test-v20
             - test-v22
+            - test-v24
