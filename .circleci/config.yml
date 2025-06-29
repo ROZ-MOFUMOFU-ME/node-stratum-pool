@@ -131,7 +131,6 @@ jobs:
 workflows:
     build:
         jobs:
-            - test-v16
             - test-v18
             - test-v20
             - test-v22

@@ -15,4 +15,8 @@ try {
     console.log('createPool call successful:', typeof pool);
 } catch (e) {
     console.error('Error in createPool call:', e.message);
+    process.exit(1);
 }
+
+console.log('All tests completed successfully');
+process.exit(0);
