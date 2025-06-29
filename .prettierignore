@@ -1,0 +1,7 @@
+node_modules/
+.git/
+*.min.js
+*.bundle.js
+coverage/
+dist/
+build/ 

@@ -3,22 +3,23 @@
         "es2022": true,
         "node": true
     },
-    "extends": ["eslint:recommended"],
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ],
     "parserOptions": {
         "ecmaVersion": 2022,
         "sourceType": "module"
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": "off",
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
-        "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "no-console": "off",
-        "no-var": "warn",
-        "prefer-const": "warn",
-        "object-shorthand": "warn",
-        "prefer-template": "warn"
+        "prefer-const": "error",
+        "no-var": "error"
     },
     "globals": {
         "global": "readonly",

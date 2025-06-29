@@ -29,7 +29,9 @@
     "scripts": {
         "test": "node test.mjs",
         "lint": "eslint lib/ test.mjs",
-        "lint:fix": "eslint lib/ test.mjs --fix"
+        "lint:fix": "eslint lib/ test.mjs --fix",
+        "format": "prettier --write lib/ test.mjs",
+        "format:check": "prettier --check lib/ test.mjs"
     },
     "repository": {
         "type": "git",
@@ -42,7 +44,9 @@
         "multi-hashing": "https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
     },
     "devDependencies": {
-        "eslint": "^8.57.0"
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^10.1.5",
+        "prettier": "^3.6.2"
     },
     "engines": {
         "node": ">=16",
