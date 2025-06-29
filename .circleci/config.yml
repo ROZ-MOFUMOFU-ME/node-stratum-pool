@@ -118,7 +118,7 @@ jobs:
         steps:
             - checkout
             - node/install:
-                  node-version: '22.16'
+                  node-version: '22.17'
             - run:
                   name: Run build
                   command: npm install
@@ -147,7 +147,7 @@ jobs:
 workflows:
     build:
         jobs:
+            - test-v16
             - test-v18
             - test-v20
             - test-v22
-            - test-v24
