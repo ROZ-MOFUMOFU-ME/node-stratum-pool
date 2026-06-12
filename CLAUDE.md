@@ -23,6 +23,7 @@ cd ../zny-nomp            && npm link stratum-pool
 ```
 
 - リンクせずに変更を zny-nomp に反映するには: このリポジトリの `dev` ブランチに push してから、zny-nomp で `npm update stratum-pool` を実行します。
+- **リンクは npm install で消える**: このリポジトリや zny-nomp で `npm install` / `npm update` を実行すると、シンボリックリンクが GitHub クローンに置き換えられます。インストール後は `npm link multi-hashing`（zny-nomp 側は `npm link stratum-pool`）を再実行してください。ローカル修正が反映されない場合はまず `ls -la node_modules/` でリンクの有無を確認してください。
 - **下流の API サーフェス**: zny-nomp はパッケージルート（`createPool`）に加えて、ディープパス `stratum-pool/lib/algoProperties.js` と `stratum-pool/lib/util.js` をインポートしています。これらのファイルパスは安定して保ってください。zny-nomp の `main` ブランチ（CommonJS）はさらにこの ESM パッケージを `require()` するため、Node 22 以上が必要です。
 - multi-hashing は NAN ネイティブアドオンです。Node のバージョンを切り替えるとテストが `Module did not self-register` で失敗します — `npm rebuild multi-hashing`（またはリンク済みの ../node-multi-hashing で `npm run build`）で直ります。Node 24 では `-std=c++20` でのビルドが必要です（`dev` の `binding.gyp` で設定済み）。
 
