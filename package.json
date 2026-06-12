@@ -38,16 +38,16 @@
         "url": "https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git"
     },
     "dependencies": {
-        "@exodus/bitcoinjs-lib-zcash": "^0.0.17",
+        "@exodus/bitcoinjs-lib-zcash": "^0.0.19",
         "async": "^3.2.6",
-        "bitcoinjs-lib": "^6.1.7",
+        "bitcoinjs-lib": "^7.0.1",
         "multi-hashing": "https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.1",
-        "eslint": "^9.39.1",
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.5.0",
         "eslint-config-prettier": "^10.1.8",
-        "prettier": "^3.7.4"
+        "prettier": "^3.8.4"
     },
     "engines": {
         "node": ">=18",
