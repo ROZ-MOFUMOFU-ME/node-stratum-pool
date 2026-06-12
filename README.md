@@ -75,17 +75,19 @@ Not working currently:
 
 ## Requirements
 
-- node v0.10+
+- Node.js v18+ (tested on Node 18, 20, 22 and 24)
 - coin daemon (preferably one with a relatively updated API and not some crapcoin :p)
+- a C/C++ toolchain with C++20 support (gcc 10+), required to build the [multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) native addon
 
 ## Example Usage
 
-#### Install as a node module by cloning repository
+#### Install as a node module
 
 ```bash
-git clone https://github.com/zone117x/node-stratum-pool node_modules/stratum-pool
-npm update
+npm install git+https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git#dev
 ```
+
+Development happens on the `dev` branch, together with the sibling repositories [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) (hashing addon) and [zny-nomp](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp) (mining portal).
 
 #### Module usage
 
