@@ -40,6 +40,10 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   getblocktemplate → share → submitblock flow.
 - Document the extended mining.notify protocol (vipstar stateroot/utxoroot,
   qtum-style 181-byte header) for miner authors.
+- **Security hardening** — review and tune the stratum server's DoS
+  protections (IP banning, connection timeouts, invalid-share thresholds)
+  and document the TLS-port configuration; this feeds the portal's
+  security-hardening focus area.
 
 ### Long-term
 - Refactor `algoProperties` so the block-hash function and difficulty
