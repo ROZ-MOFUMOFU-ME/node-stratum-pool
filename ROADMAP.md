@@ -48,6 +48,9 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   the extranonce-rolling behavior NiceHash miners require, so rented NiceHash
   hashpower can be pointed at a pool (pairs with the portal's NiceHash API
   integration).
+- **WebSocket→stratum bridge** — let browser miners (a WASM build of
+  multi-hashing) connect over WebSocket, backing the portal's browser-mining
+  feature.
 
 ### Long-term
 - Refactor `algoProperties` so the block-hash function and difficulty
