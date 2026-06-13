@@ -1,6 +1,7 @@
 {
     "name": "stratum-pool",
-    "version": "0.2.9",
+    "version": "0.3.1",
+    "type": "module",
     "description": "High performance Stratum poolserver in Node.js",
     "keywords": [
         "stratum",
@@ -26,20 +27,30 @@
     ],
     "main": "lib/index.js",
     "scripts": {
-        "test": "node lib/test.js"
+        "test": "node test.mjs",
+        "lint": "eslint lib/ test.mjs",
+        "lint:fix": "eslint lib/ test.mjs --fix",
+        "format": "prettier --write lib/ test.mjs eslint.config.js .prettierrc",
+        "format:check": "prettier --check lib/ test.mjs eslint.config.js .prettierrc"
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git"
     },
     "dependencies": {
-        "@exodus/bitcoinjs-lib-zcash": "^0.0.14",
+        "@exodus/bitcoinjs-lib-zcash": "^0.0.19",
         "async": "^3.2.6",
-        "bitcoinjs-lib": "^6.1.7",
-        "multi-hashing": "git+https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git"
+        "bitcoinjs-lib": "^7.0.1",
+        "multi-hashing": "https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing.git#dev"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.5.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.8.4"
     },
     "engines": {
-        "node": ">=16",
-        "npm": ">=7"
+        "node": ">=18",
+        "npm": ">=9"
     }
 }
