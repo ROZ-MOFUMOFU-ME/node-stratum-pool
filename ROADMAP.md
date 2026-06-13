@@ -49,6 +49,11 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 - Refactor `algoProperties` so the block-hash function and difficulty
   multiplier are declared per algorithm in one place, reducing the
   duplicated `switch` branches in `jobManager`.
+- **Ethash-family support** — register `kawpow`/`ethash` (the addon already
+  vendors the library) in `algoProperties`, and handle the Ethash job model:
+  epoch / DAG / seedhash and the distinct `mining.notify` / `mining.submit`
+  shape, which differs substantially from the current Bitcoin-style header
+  flow. This is a large change, hence long-term.
 - **Monorepo consolidation** — this library is intended to eventually merge
   with zny-nomp and node-multi-hashing into a single monorepo (see the
   [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md)),
