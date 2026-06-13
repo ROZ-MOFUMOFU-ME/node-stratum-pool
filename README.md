@@ -1,15 +1,7 @@
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
 pools, each with their own daemon and stratum port :)
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
-[![Lint/Format](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)
-[![GitHub CI](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)
-[![CircleCI](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main.svg?style=svg)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=white)](https://www.javascript.com/)
-[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org/)
-[![Prettier](https://img.shields.io/badge/Code%20Style-Prettier-f7b93e.svg)](https://prettier.io/)
-[![ESLint](https://img.shields.io/badge/Code%20Quality-ESLint-4b32c3.svg)](https://eslint.org/)
-[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://opensource.org/licenses/GPL-2.0)
+[![CI](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/node.js.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)&nbsp;[![Lint](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/lint-format.yml?branch=main&style=flat-square&logo=prettier&logoColor=white&label=lint)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)&nbsp;[![CircleCI](https://img.shields.io/circleci/build/github/ROZ-MOFUMOFU-ME/node-stratum-pool/main?style=flat-square&logo=circleci&label=CircleCI)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)&nbsp;[![Node.js](https://img.shields.io/badge/node-%E2%89%A520-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)&nbsp;[![License](https://img.shields.io/badge/license-GPLv2-blue?style=flat-square)](https://opensource.org/licenses/GPL-2.0)&nbsp;[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
 
 #### Notice
 
