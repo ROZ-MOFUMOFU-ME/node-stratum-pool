@@ -1,6 +1,7 @@
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
 pools, each with their own daemon and stratum port :)
 
+[![gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ROZ-MOFUMOFU-ME/zny-nomp)
 [![Lint/Format](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)
 [![GitHub CI](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)
 [![CircleCI](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main.svg?style=svg)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)
