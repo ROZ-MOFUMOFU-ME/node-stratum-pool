@@ -1,46 +1,17 @@
 version: 2.1
 orbs:
-    node: circleci/node@5.2
+    node: circleci/node@7.1
 jobs:
-    test-v18:
+    test:
+        parameters:
+            node-version:
+                type: string
         docker:
             - image: cimg/base:stable
         steps:
             - checkout
             - node/install:
-                  node-version: '18.20'
-            - run:
-                  name: Run build
-                  command: npm install
-            - run:
-                  name: Run tests
-                  command: npm run test
-            - run:
-                  name: Verify build
-                  command: echo "Build and Test completed successfully!"
-    test-v20:
-        docker:
-            - image: cimg/base:stable
-        steps:
-            - checkout
-            - node/install:
-                  node-version: '20.19'
-            - run:
-                  name: Run build
-                  command: npm install
-            - run:
-                  name: Run tests
-                  command: npm run test
-            - run:
-                  name: Verify build
-                  command: echo "Build and Test completed successfully!"
-    test-v22:
-        docker:
-            - image: cimg/base:stable
-        steps:
-            - checkout
-            - node/install:
-                  node-version: '22.17'
+                  node-version: << parameters.node-version >>
             - run:
                   name: Run build
                   command: npm install
@@ -53,6 +24,7 @@ jobs:
 workflows:
     build:
         jobs:
-            - test-v18
-            - test-v20
-            - test-v22
+            - test:
+                  matrix:
+                      parameters:
+                          node-version: ['20', '22', '24']
