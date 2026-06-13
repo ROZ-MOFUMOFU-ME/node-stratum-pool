@@ -4,17 +4,17 @@
 
 ## マルチリポジトリ開発
 
-このライブラリは、一体で開発される3リポジトリ構成の中間層です。**3リポジトリとも統合ブランチは `dev` で、開発作業は `dev` 上で行います**（`main` は安定版。利用側はこのリポジトリの `dev` ブランチを git 依存としてインストールします）。兄弟リポジトリは隣のディレクトリにローカルクローンがある前提です:
+このライブラリは、一体で開発される3リポジトリ構成の中間層です。**3リポジトリとも単一の `main` ブランチで開発します**（2026-06-13 に dev/stable/old を main へ統合して削除しました。利用側はこのリポジトリの `main` ブランチを git 依存としてインストールします）。**このリポジトリの `main` は保護ブランチで直接 push が拒否されるため、変更はフィーチャーブランチ → PR でマージします**（GITHUB_TOKEN があれば API で PR 作成・マージ可能）。兄弟リポジトリは隣のディレクトリにローカルクローンがある前提です:
 
 ```
-../zny-nomp (ポータル本体, CommonJS=main / ESM=dev)
-  └─ stratum-pool (このリポジトリ — ESM, git 依存 ROZ-MOFUMOFU-ME/node-stratum-pool#dev として公開)
-       └─ multi-hashing = git: ROZ-MOFUMOFU-ME/node-multi-hashing#dev → ローカルクローン: ../node-multi-hashing (ネイティブアドオン)
+../zny-nomp (ポータル本体, ESM)
+  └─ stratum-pool (このリポジトリ — ESM, git 依存 ROZ-MOFUMOFU-ME/node-stratum-pool#main として公開)
+       └─ multi-hashing = git: ROZ-MOFUMOFU-ME/node-multi-hashing#main → ローカルクローン: ../node-multi-hashing (ネイティブアドオン)
 ```
 
 各兄弟リポジトリにもそれぞれ CLAUDE.md があります。重要なポイント:
 
-- `multi-hashing` は**ローカルパスではなく GitHub の `#dev` ブランチに固定**されています — `../zny-nomp` もこのリポジトリを同じ方式で利用します。ローカルの編集は `dev` に push するまでリポジトリ間に伝わりません。ローカルクローンをリンクする場合:
+- `multi-hashing` は**ローカルパスではなく GitHub の `#main` ブランチに固定**されています — `../zny-nomp` もこのリポジトリを同じ方式で利用します。ローカルの編集は `main` に push（PR 経由）するまでリポジトリ間に伝わりません。ローカルクローンをリンクする場合:
 
 ```bash
 cd ../node-multi-hashing  && npm link              # ネイティブアドオンをビルド
@@ -22,10 +22,10 @@ cd .                      && npm link multi-hashing && npm link
 cd ../zny-nomp            && npm link stratum-pool
 ```
 
-- リンクせずに変更を zny-nomp に反映するには: このリポジトリの `dev` ブランチに push してから、zny-nomp で `npm update stratum-pool` を実行します。
+- リンクせずに変更を zny-nomp に反映するには: このリポジトリの `main` に PR でマージしてから、zny-nomp で `npm update stratum-pool` を実行します。
 - **リンクは npm install で消える**: このリポジトリや zny-nomp で `npm install` / `npm update` を実行すると、シンボリックリンクが GitHub クローンに置き換えられます。インストール後は `npm link multi-hashing`（zny-nomp 側は `npm link stratum-pool`）を再実行してください。ローカル修正が反映されない場合はまず `ls -la node_modules/` でリンクの有無を確認してください。
-- **下流の API サーフェス**: zny-nomp はパッケージルート（`createPool`）に加えて、ディープパス `stratum-pool/lib/algoProperties.js` と `stratum-pool/lib/util.js` をインポートしています。これらのファイルパスは安定して保ってください。zny-nomp の `main` ブランチ（CommonJS）はさらにこの ESM パッケージを `require()` するため、Node 22 以上が必要です。
-- multi-hashing は NAN ネイティブアドオンです。Node のバージョンを切り替えるとテストが `Module did not self-register` で失敗します — `npm rebuild multi-hashing`（またはリンク済みの ../node-multi-hashing で `npm run build`）で直ります。Node 24 では `-std=c++20` でのビルドが必要です（`dev` の `binding.gyp` で設定済み）。
+- **下流の API サーフェス**: zny-nomp はパッケージルート（`createPool`）に加えて、ディープパス `stratum-pool/lib/algoProperties.js` と `stratum-pool/lib/util.js` をインポートしています。これらのファイルパスは安定して保ってください。
+- multi-hashing は NAN ネイティブアドオンです。Node のバージョンを切り替えるとテストが `Module did not self-register` で失敗します — `npm rebuild multi-hashing`（またはリンク済みの ../node-multi-hashing で `npm run build`）で直ります。Node 24 では `-std=c++20` でのビルドが必要です（`binding.gyp` で設定済み）。
 
 ## コマンド
 
@@ -39,7 +39,7 @@ npm run format:check
 
 Node `>=18` が必要。`.nvmrc` は 22.x を指定。コードスタイルは Prettier（4スペースインデント・100桁・シングルクォート・es5 トレーリングカンマ）と ESLint 9 フラット設定（`eslint.config.js`）で強制されます。
 
-ブランチ: `main`（デフォルト）、`dev`（開発＋利用側がインストールする先）、`stable`。Node 24 での動作確認済み。
+ブランチ: `main` のみ（保護ブランチ、PR でマージ）。Node 24 での動作確認済み。
 
 ## アーキテクチャ
 
