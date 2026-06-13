@@ -1,6 +1,8 @@
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
 pools, each with their own daemon and stratum port :)
 
+**Roadmap:** see [ROADMAP.md](ROADMAP.md) for current status, known issues, and planned improvements.
+
 [![CI](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/node.js.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)&nbsp;[![Lint](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/lint-format.yml?branch=main&style=flat-square&logo=prettier&logoColor=white&label=lint)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)&nbsp;[![CircleCI](https://img.shields.io/circleci/build/github/ROZ-MOFUMOFU-ME/node-stratum-pool/main?style=flat-square&logo=circleci&label=CircleCI)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)&nbsp;[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://www.javascript.com/)&nbsp;[![Node.js](https://img.shields.io/badge/node-%E2%89%A520-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)&nbsp;[![Bitcoin](https://img.shields.io/badge/Bitcoin-F7931A?style=flat-square&logo=bitcoin&logoColor=white)](https://bitcoin.org/)&nbsp;[![License](https://img.shields.io/badge/license-GPLv2-blue?style=flat-square)](https://opensource.org/licenses/GPL-2.0)&nbsp;[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
 
 #### Notice
