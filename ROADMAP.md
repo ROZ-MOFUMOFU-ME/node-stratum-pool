@@ -53,6 +53,10 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 - Refactor `algoProperties` so the block-hash function and difficulty
   multiplier are declared per algorithm in one place, reducing the
   duplicated `switch` branches in `jobManager`.
+- **TypeScript migration** — part of the stack-wide architecture
+  modernization (see the [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md));
+  typed pool options and RPC/job shapes would catch whole classes of bugs
+  (the vipstar/lyra2rev2 block-hash issues among them).
 - **Ethash-family support** — register `kawpow`/`ethash` (the addon already
   vendors the library) in `algoProperties`, and handle the Ethash job model:
   epoch / DAG / seedhash and the distinct `mining.notify` / `mining.submit`
