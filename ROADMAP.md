@@ -45,3 +45,7 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 - Refactor `algoProperties` so the block-hash function and difficulty
   multiplier are declared per algorithm in one place, reducing the
   duplicated `switch` branches in `jobManager`.
+- **Monorepo consolidation** — this library is intended to eventually merge
+  with zny-nomp and node-multi-hashing into a single monorepo (see the
+  [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md)),
+  removing the git-dependency pinning and `npm link` chain.
