@@ -5,7 +5,7 @@ pools, each with their own daemon and stratum port :)
 [![GitHub CI](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml/badge.svg)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)
 [![CircleCI](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main.svg?style=svg)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=white)](https://www.javascript.com/)
-[![Node.js](https://img.shields.io/badge/Node.js-22.x-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%20%7C%2020%20%7C%2022%20%7C%2024-green.svg)](https://nodejs.org/)
 [![Prettier](https://img.shields.io/badge/Code%20Style-Prettier-f7b93e.svg)](https://prettier.io/)
 [![ESLint](https://img.shields.io/badge/Code%20Quality-ESLint-4b32c3.svg)](https://eslint.org/)
 [![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://opensource.org/licenses/GPL-2.0)
@@ -58,7 +58,10 @@ lower barrier to entry for other developers to fork and add features or fix bugs
 - ✓ **Yescrypt-0.5** (BitZeny [ZNY])
 - ✓ **Yescrypt** (Koto [KOTO], Elicoin,[ELI], etc..)
 - ✓ **YesPoWer** (Cryply [CRP], Bellcoin [BELL], etc..)
+- ✓ **YesPoWerSUGAR** (Sugarchain [SUGAR])
+- ✓ **YescryptR8G** (Koto [KOTO])
 - ✓ **LyraREv2** (Monacoin [MONA], Mangacoin [MANGA], etc..)
+- ✓ **vipstar** (VIPSTARCOIN [VIPS] — sha256d over a qtum-style 181-byte header)
 
 May be working (needs additional testing):
 
@@ -84,10 +87,10 @@ Not working currently:
 #### Install as a node module
 
 ```bash
-npm install git+https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git#dev
+npm install git+https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git#main
 ```
 
-Development happens on the `dev` branch, together with the sibling repositories [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) (hashing addon) and [zny-nomp](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp) (mining portal).
+Development happens on the `main` branch, together with the sibling repositories [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) (hashing addon) and [zny-nomp](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp) (mining portal). This `main` branch is protected, so changes land via pull request.
 
 #### Module usage
 
