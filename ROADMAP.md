@@ -44,6 +44,10 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   protections (IP banning, connection timeouts, invalid-share thresholds)
   and document the TLS-port configuration; this feeds the portal's
   security-hardening focus area.
+- **NiceHash-compatible stratum** — support `mining.extranonce.subscribe` and
+  the extranonce-rolling behavior NiceHash miners require, so rented NiceHash
+  hashpower can be pointed at a pool (pairs with the portal's NiceHash API
+  integration).
 
 ### Long-term
 - Refactor `algoProperties` so the block-hash function and difficulty
