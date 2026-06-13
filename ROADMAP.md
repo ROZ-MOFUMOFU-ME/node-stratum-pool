@@ -54,6 +54,9 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   epoch / DAG / seedhash and the distinct `mining.notify` / `mining.submit`
   shape, which differs substantially from the current Bitcoin-style header
   flow. This is a large change, hence long-term.
+- More algorithms as the addon gains them (RandomX, Equihash, Autolykos,
+  KHeavyHash), and optional merged mining (AuxPoW) for parent/aux chains.
+- Evaluate Stratum V2 support (encrypted, more efficient mining protocol).
 - **Monorepo consolidation** — this library is intended to eventually merge
   with zny-nomp and node-multi-hashing into a single monorepo (see the
   [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md)),
