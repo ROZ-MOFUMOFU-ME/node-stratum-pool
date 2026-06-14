@@ -14,18 +14,26 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   vipstar (VIPSTARCOIN, 181-byte qtum-style header), sha256d, quark, x11.
 - Developer-fee coinbase output (Yenten 6.1) and the extended `mining.notify`
   params for VIPSTARCOIN (reversed stateroot/utxoroot) are implemented.
+- **Sapling block construction (Koto)**: the block merkle root is built from
+  each transaction's full-serialization hash (`sha256d`, the getblocktemplate
+  `hash`), not `txid` — shielded Sapling txs have `txid != sha256d(tx)`, so
+  using `txid` corrupted the root and the daemon rejected any block carrying a
+  shielded mempool tx with `CheckBlock(): hashMerkleRoot mismatch`. Blocks now
+  pass the daemon's merkle check; Bitcoin/segwit chains still commit `txid`.
 
 ## Known issues & limitations
 
-- **Minimal test** — `test.mjs` only imports the module and calls
-  `createPool()`; there is no per-algorithm or protocol-level coverage.
+- **Minimal test** — `test.mjs` imports the module, calls `createPool()`, and
+  asserts the per-chain merkle-leaf selection (Sapling=`hash`, Bitcoin=`txid`);
+  there is still no broader per-algorithm or protocol-level coverage.
 - Several algorithms in the README are marked "may work" / "not working" and
   are unverified against live daemons.
 - Coin-specific paths (Koto founders reward, Dash masternode/superblock
   payees, POS reward type) have no regression coverage.
 - `algoProperties.js` block-hash handling has repetitive per-algorithm
   branches that are easy to get subtly wrong (the vipstar/lyra2rev2 fixes
-  were both block-hash issues).
+  were both block-hash issues; the Koto Sapling merkle-leaf fix was a related
+  per-chain serialization issue, now guarded by a regression test).
 
 ## Roadmap
 
