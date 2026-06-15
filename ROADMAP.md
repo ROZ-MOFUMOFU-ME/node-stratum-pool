@@ -7,7 +7,10 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 
 ## Current state
 
-- ESM library, Node 20–24, linted with ESLint 9 + Prettier.
+- ESM library, Node `^20.19 || >=22.12` (Node 24 recommended), linted with
+  ESLint 9 + Prettier. The `@exodus/crypto` transitive dep (via
+  `@exodus/bitcoinjs-lib-zcash`, used for Koto/Zcash addresses) is ESM loaded
+  through `require()`, so 20.0–20.18 / 22.0–22.11 fail with `ERR_REQUIRE_ESM`.
 - bitcoinjs-lib 7 for address/script handling.
 - **Verified algorithms** (mining → submitblock accepted): yescrypt family,
   yespower family (incl. yespowerSUGAR), yescryptR8G, lyra2rev2 (Monacoin),
