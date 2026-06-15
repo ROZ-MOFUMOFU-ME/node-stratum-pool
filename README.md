@@ -1,9 +1,17 @@
+# node-stratum-pool
+
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
 pools, each with their own daemon and stratum port :)
 
 **Roadmap:** see [ROADMAP.md](ROADMAP.md) for current status, known issues, and planned improvements.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/node.js.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)&nbsp;[![Lint](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/lint-format.yml?branch=main&style=flat-square&logo=prettier&logoColor=white&label=lint)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)&nbsp;[![CircleCI](https://img.shields.io/circleci/build/github/ROZ-MOFUMOFU-ME/node-stratum-pool/main?style=flat-square&logo=circleci&label=CircleCI)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)&nbsp;[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://www.javascript.com/)&nbsp;[![Node.js](https://img.shields.io/badge/node-%E2%89%A520-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)&nbsp;[![Bitcoin](https://img.shields.io/badge/Bitcoin-F7931A?style=flat-square&logo=bitcoin&logoColor=white)](https://bitcoin.org/)&nbsp;[![License](https://img.shields.io/badge/license-GPLv2-blue?style=flat-square)](https://opensource.org/licenses/GPL-2.0)&nbsp;[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
+
+### Community
+
+ZNY-NOMP official Discord Server
+
+- Join [https://discord.gg/zHUdQy2NzU](https://discord.gg/zHUdQy2NzU)
 
 #### Notice
 
@@ -354,7 +362,33 @@ Start pool
 pool.start();
 ```
 
+## Donations
+
+Donations for development are greatly appreciated!
+
+- ZNY: ZmnBu9jPKvVFL22PcwMHSEuVpTxFeCdvNv
+- NUKO: 0xa79bde46faab3c40632604728e9f2165b052581c
+- KOTO: k1FTuimwDJ8oo3x23cEBLxovxw5Cqq2U1HK
+- SUSU: SeXbMBaax7NgnTEFEMxin5ycXy9r9CDBot
+- MONA: MLEqE3vi11j4ZguMjkvMn5rUtze6kXbAzQ
+- BELL: BCVicYRSqKKt1ynJKPrXHA46hUWLrbjR49
+- SUGAR: sugar1qtwqle9lrr753kxuzqqsh3hv28jl07e3mntx78n
+- VIPS: VFixsia2EstV4uEEigUXUrknDGsFeWyNhE
+- KUMA: KHjjZ5misqq45zwhj86WKqV8bzqcYExzyM
+- BTC: 3FpbJ5cotwPZQn9fcdZrPv4h72XquzEvez
+- ETH: 0xc664a0416c23b1b13a18e86cb5fdd1007be375ae
+- LTC: Lh96WZ7Rw9Wf4GDX2KXpzieneZFV5Xe5ou
+- BCH: pzdsppue8uwc20x35psaqq8sgchkenr49c0qxzazxu
+- ETC: 0xc664a0416c23b1b13a18e86cb5fdd1007be375ae
+
 ## Credits
+
+### node-stratum-pool
+
+- [ROZ](https://github.com/ROZ-MOFUMOFU-ME)
+- [zinntikumugai](https://github.com/zinntikumugai) - great supporter
+
+### NOMP / node-stratum-pool
 
 - [vekexasia](//github.com/vekexasia) - co-developer & great tester
 - [LucasJones](//github.com/LucasJones) - got p2p block notify working and implemented additional hashing algos
@@ -365,21 +399,80 @@ pool.start();
 - [ahmedbodi](//github.com/ahmedbodi/stratum-mining) - more algo adaptions to python code
 - [steveshit](//github.com/steveshit) - ported X11 hashing algo from python to node module
 
-## Donations
+## 🤝 Contributing
 
-To support development of this project feel free to donate :)
+We welcome contributions! Please follow these steps:
 
-- BTC: `1KRotMnQpxu3sePQnsVLRy3EraRFYfJQFR`
-- LTC: `LKfavSDJmwiFdcgaP1bbu46hhyiWw5oFhE`
-- VTC: `VgW4uFTZcimMSvcnE4cwS3bjJ6P8bcTykN`
-- MAX: `mWexUXRCX5PWBmfh34p11wzS5WX2VWvTRT`
-- QRK: `QehPDAhzVQWPwDPQvmn7iT3PoFUGT7o8bC`
-- DRK: `XcQmhp8ANR7okWAuArcNFZ2bHSB81jpapQ`
-- DOGE: `DBGGVtwAAit1NPZpRm5Nz9VUFErcvVvHYW`
-- Cryptsy Trade Key: `254ca13444be14937b36c44ba29160bd8f02ff76`
+1. 🔀 Fork this repository
+2. 🌿 Create a new branch (`git checkout -b feature/amazing-feature`)
+3. 💾 Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. 📤 Push to the branch (`git push origin feature/amazing-feature`)
+5. 🔃 Open a Pull Request
 
-## License
+### 📋 Contributing Guidelines
 
-Released under the GNU General Public License v2
+- Follow the ESLint configuration for code style
+- Use Prettier to format your code before committing
+- Write clear and descriptive commit messages
 
-http://www.gnu.org/licenses/gpl-2.0.html
+#### Code Formatting
+
+Before submitting a pull request, please ensure your code is properly formatted:
+
+```bash
+# Format all files
+npm run format
+
+# Check code quality with ESLint
+npm run lint
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the GNU General Public License v2.0. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👥 Team
+
+<div align="center">
+
+[![Contributors](https://contrib.rocks/image?repo=ROZ-MOFUMOFU-ME/node-stratum-pool)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/graphs/contributors)
+
+</div>
+
+---
+
+## 📞 Support
+
+- 🐛 **Bug Reports**: [Issues](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/issues)
+- 💡 **Feature Requests**: [Discussions](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/discussions)
+- 💬 **Community**: [Discord](https://discord.gg/zHUdQy2NzU)
+
+---
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ROZ-MOFUMOFU-ME/node-stratum-pool&type=Date&theme=dark)](https://star-history.com/#ROZ-MOFUMOFU-ME/node-stratum-pool&Date)
+
+---
+
+## 📊 Statistics
+
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=ROZ-MOFUMOFU-ME&repo=node-stratum-pool&show_icons=true&theme=dark)
+
+---
+
+<div align="center">
+
+**⭐ If you like this project, please give it a star! ⭐**
+
+[![GitHub stars](https://img.shields.io/github/stars/ROZ-MOFUMOFU-ME/node-stratum-pool.svg?style=social&label=Star)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool)
+[![GitHub forks](https://img.shields.io/github/forks/ROZ-MOFUMOFU-ME/node-stratum-pool.svg?style=social&label=Fork)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/fork)
+[![GitHub watchers](https://img.shields.io/github/watchers/ROZ-MOFUMOFU-ME/node-stratum-pool.svg?style=social&label=Watch)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool)
+
+Made with ❤️ by [ROZ](https://github.com/ROZ-MOFUMOFU-ME)
+
+</div>
