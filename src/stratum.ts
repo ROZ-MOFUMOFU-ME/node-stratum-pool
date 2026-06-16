@@ -547,7 +547,7 @@ const StratumClient = function (this: any, options: any) {
             ? function () {
                   return false;
               }
-            : function (this: any, shareValid: any) {
+            : function (shareValid: any) {
                   if (shareValid === true) _this.shares.valid++;
                   else _this.shares.invalid++;
                   const totalShares = _this.shares.valid + _this.shares.invalid;
@@ -555,7 +555,7 @@ const StratumClient = function (this: any, options: any) {
                       const percentBad = (_this.shares.invalid / totalShares) * 100;
                       if (percentBad < banning.invalidPercent)
                           //reset shares
-                          this.shares = { valid: 0, invalid: 0 };
+                          _this.shares = { valid: 0, invalid: 0 };
                       else {
                           _this.emit(
                               'triggerBan',
