@@ -1,34 +1,35 @@
-import merkleTree from './merkleTree.js';
-import transactions from './transactions.js';
-import * as util from './util.js';
+import merkleTree from './merkleTree.ts';
+import transactions from './transactions.ts';
+import * as util from './util.ts';
 
 // import algos, { diff1 } from './algoProperties.js'; // Only diff1 is used
-import { diff1 } from './algoProperties.js';
+import { diff1 } from './algoProperties.ts';
 
 /**
  * The BlockTemplate class holds a single job.
  * and provides several methods to validate and submit it to the daemon coin
  **/
 const BlockTemplate = function BlockTemplate(
-    jobId,
-    rpcData,
-    poolAddressScript,
-    extraNoncePlaceholder,
-    reward,
-    txMessages,
-    recipients,
-    network
+    this: any,
+    jobId: any,
+    rpcData: any,
+    poolAddressScript: any,
+    extraNoncePlaceholder: any,
+    reward: any,
+    txMessages: any,
+    recipients: any,
+    network: any
 ) {
     // private members
-    const submits = [];
+    const submits: any[] = [];
 
-    function getMerkleHashes(steps) {
+    function getMerkleHashes(steps: any[]) {
         return steps.map(function (step) {
             return step.toString('hex');
         });
     }
 
-    function getTransactionBuffers(txs) {
+    function getTransactionBuffers(txs: any[]) {
         // Which transaction hash gets committed to the block merkle root differs
         // by chain family:
         //   - Zcash/Sapling chains (e.g. Koto) commit each tx's GetHash() — the
@@ -53,7 +54,7 @@ const BlockTemplate = function BlockTemplate(
             }
             return util.uint256BufferFromHash(tx.hash);
         });
-        return [null].concat(txHashes);
+        return ([null] as any[]).concat(txHashes);
     }
 
     function getVoteData() {
@@ -61,7 +62,7 @@ const BlockTemplate = function BlockTemplate(
 
         return Buffer.concat(
             [util.varIntBuffer(rpcData.votes.length)].concat(
-                rpcData.votes.map(function (vt) {
+                rpcData.votes.map(function (vt: any) {
                     return Buffer.from(vt, 'hex');
                 })
             )
@@ -107,11 +108,11 @@ const BlockTemplate = function BlockTemplate(
             .toString('hex');
     }
     this.transactionData = Buffer.concat(
-        rpcData.transactions.map(function (tx) {
+        rpcData.transactions.map(function (tx: any) {
             return Buffer.from(tx.data, 'hex');
         })
     );
-    this.merkleTree = new merkleTree(getTransactionBuffers(rpcData.transactions));
+    this.merkleTree = new (merkleTree as any)(getTransactionBuffers(rpcData.transactions));
     this.merkleBranch = getMerkleHashes(this.merkleTree.steps);
     this.generationTransaction = transactions.CreateGeneration(
         rpcData,
@@ -123,7 +124,7 @@ const BlockTemplate = function BlockTemplate(
         network
     );
 
-    this.serializeCoinbase = function (extraNonce1, extraNonce2) {
+    this.serializeCoinbase = function (this: any, extraNonce1: Buffer, extraNonce2: Buffer) {
         return Buffer.concat([
             this.generationTransaction[0],
             extraNonce1,
@@ -133,7 +134,7 @@ const BlockTemplate = function BlockTemplate(
     };
 
     // https://en.bitcoin.it/wiki/Protocol_specification#Block_Headers
-    this.serializeHeader = function (merkleRoot, nTime, nonce, versionMask) {
+    this.serializeHeader = function (merkleRoot: any, nTime: any, nonce: any, versionMask: any) {
         let headerSize;
         if (rpcData.version == 5 && rpcData.finalsaplingroothash) {
             headerSize = 112;
@@ -179,7 +180,7 @@ const BlockTemplate = function BlockTemplate(
         return util.reverseBuffer(header);
     };
 
-    this.serializeBlock = function (header, coinbase) {
+    this.serializeBlock = function (this: any, header: Buffer, coinbase: Buffer) {
         return Buffer.concat([
             header,
             util.varIntBuffer(this.rpcData.transactions.length + 1),
@@ -190,7 +191,7 @@ const BlockTemplate = function BlockTemplate(
         ]);
     };
 
-    this.registerSubmit = function (extraNonce1, extraNonce2, nTime, nonce) {
+    this.registerSubmit = function (extraNonce1: any, extraNonce2: any, nTime: any, nonce: any) {
         const submission = extraNonce1 + extraNonce2 + nTime + nonce;
         if (submits.indexOf(submission) === -1) {
             submits.push(submission);
@@ -199,14 +200,14 @@ const BlockTemplate = function BlockTemplate(
         return false;
     };
 
-    this.getOdoKey = function () {
+    this.getOdoKey = function (this: any) {
         if (this.rpcData && this.rpcData.odokey !== undefined) {
             return this.rpcData.odokey;
         }
         return null;
     };
 
-    this.getJobParams = function () {
+    this.getJobParams = function (this: any) {
         if (!this.jobParams) {
             this.jobParams = [
                 this.jobId,

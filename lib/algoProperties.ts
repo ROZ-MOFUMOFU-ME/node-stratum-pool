@@ -1,17 +1,17 @@
 import multiHashing from 'multi-hashing';
-import * as util from './util.js';
+import * as util from './util.ts';
 
-const diff1 = (global.diff1 = BigInt(
+const diff1 = ((global as any).diff1 = BigInt(
     '0x00000000ffff0000000000000000000000000000000000000000000000000000'
 ));
 
-const algos = (global.algos = {
+const algos: any = ((global as any).algos = {
     sha256: {
         //Uncomment diff if you want to use hardcoded truncated diff
         //diff: '00000000ffff0000000000000000000000000000000000000000000000000000',
         hash() {
-            return function () {
-                return util.sha256d.apply(this, arguments);
+            return function (this: any) {
+                return util.sha256d.apply(this, arguments as any);
             };
         },
     },
@@ -19,8 +19,8 @@ const algos = (global.algos = {
         //Uncomment diff if you want to use hardcoded truncated diff
         //diff: '00000000ffff0000000000000000000000000000000000000000000000000000',
         hash() {
-            return function () {
-                return multiHashing.sha256d.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.sha256d.apply(this, arguments as any);
             };
         },
     },
@@ -28,10 +28,10 @@ const algos = (global.algos = {
         //Uncomment diff if you want to use hardcoded truncated diff
         //diff: '0000ffff00000000000000000000000000000000000000000000000000000000',
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nValue = coinConfig.nValue || 1024;
             const rValue = coinConfig.rValue || 1;
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.scrypt(data, nValue, rValue);
             };
         },
@@ -41,29 +41,29 @@ const algos = (global.algos = {
         //Uncomment diff if you want to use hardcoded truncated diff
         //diff: '0000ffff00000000000000000000000000000000000000000000000000000000',
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nValue = coinConfig.nValue || 64;
             const rValue = coinConfig.rValue || 1;
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.scrypt(data, nValue, rValue);
             };
         },
     },
     'scrypt-jane': {
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nTimestamp = coinConfig.chainStartTime || 1367991200;
             const nMin = coinConfig.nMin || 4;
             const nMax = coinConfig.nMax || 30;
-            return function (data, nTime) {
+            return function (data: Buffer, nTime: number) {
                 return multiHashing.scryptjane(data, nTime, nTimestamp, nMin, nMax);
             };
         },
     },
     'scrypt-n': {
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
-            const timeTable = coinConfig.timeTable || {
+        hash(coinConfig: any) {
+            const timeTable: any = coinConfig.timeTable || {
                 2048: 1389306217,
                 4096: 1456415081,
                 8192: 1506746729,
@@ -87,95 +87,95 @@ const algos = (global.algos = {
                 return Math.log(nInt) / Math.log(2);
             })();
 
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.scryptn(data, nFactor);
             };
         },
     },
     sha1: {
         hash() {
-            return function () {
-                return multiHashing.sha1.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.sha1.apply(this, arguments as any);
             };
         },
     },
     x11: {
         hash() {
-            return function () {
-                return multiHashing.x11.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x11.apply(this, arguments as any);
             };
         },
     },
     x13: {
         hash() {
-            return function () {
-                return multiHashing.x13.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x13.apply(this, arguments as any);
             };
         },
     },
     x15: {
         hash() {
-            return function () {
-                return multiHashing.x15.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x15.apply(this, arguments as any);
             };
         },
     },
     x16r: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.x16r.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x16r.apply(this, arguments as any);
             };
         },
     },
     x16rv2: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.x16rv2.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x16rv2.apply(this, arguments as any);
             };
         },
     },
     x17: {
         hash() {
-            return function () {
-                return multiHashing.x17.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x17.apply(this, arguments as any);
             };
         },
     },
     skydoge: {
         hash() {
-            return function () {
-                return multiHashing.skydoge.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.skydoge.apply(this, arguments as any);
             };
         },
     },
     x25x: {
         hash() {
-            return function () {
-                return multiHashing.x25x.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.x25x.apply(this, arguments as any);
             };
         },
     },
     nist5: {
         hash() {
-            return function () {
-                return multiHashing.nist5.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.nist5.apply(this, arguments as any);
             };
         },
     },
     quark: {
         hash() {
-            return function () {
-                return multiHashing.quark.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.quark.apply(this, arguments as any);
             };
         },
     },
     keccak: {
         multiplier: Math.pow(2, 8),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             if (coinConfig.normalHashing === true) {
-                return function (data, nTimeInt) {
+                return function (data: Buffer, nTimeInt: number) {
                     return multiHashing.keccak(
                         multiHashing.keccak(
                             Buffer.concat([data, Buffer.from(nTimeInt.toString(16), 'hex')])
@@ -183,8 +183,8 @@ const algos = (global.algos = {
                     );
                 };
             } else {
-                return function () {
-                    return multiHashing.keccak.apply(this, arguments);
+                return function (this: any) {
+                    return multiHashing.keccak.apply(this, arguments as any);
                 };
             }
         },
@@ -192,130 +192,130 @@ const algos = (global.algos = {
     allium: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.allium.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.allium.apply(this, arguments as any);
             };
         },
     },
     blake: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.blake.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.blake.apply(this, arguments as any);
             };
         },
     },
     blake2s: {
         multiplier: Math.pow(2, 0),
         hash() {
-            return function () {
-                return multiHashing.blake2s.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.blake2s.apply(this, arguments as any);
             };
         },
     },
     skein: {
         hash() {
-            return function () {
-                return multiHashing.skein.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.skein.apply(this, arguments as any);
             };
         },
     },
     groestl: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.groestl.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.groestl.apply(this, arguments as any);
             };
         },
     },
     groestlmyriad: {
         hash() {
-            return function () {
-                return multiHashing.groestlmyriad.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.groestlmyriad.apply(this, arguments as any);
             };
         },
     },
     fugue: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.fugue.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.fugue.apply(this, arguments as any);
             };
         },
     },
     shavite3: {
         hash() {
-            return function () {
-                return multiHashing.shavite3.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.shavite3.apply(this, arguments as any);
             };
         },
     },
     hefty1: {
         hash() {
-            return function () {
-                return multiHashing.hefty1.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.hefty1.apply(this, arguments as any);
             };
         },
     },
     neoscrypt: {
         multiplier: Math.pow(2, 5),
         hash() {
-            return function () {
-                return multiHashing.neoscrypt.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.neoscrypt.apply(this, arguments as any);
             };
         },
     },
     minotaur: {
         hash() {
-            return function () {
-                return multiHashing.minotaur.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.minotaur.apply(this, arguments as any);
             };
         },
     },
     lyra2: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.lyra2re.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2re.apply(this, arguments as any);
             };
         },
     },
     lyra2v2: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.lyra2rev2.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2rev2.apply(this, arguments as any);
             };
         },
     },
     lyra2v3: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.lyra2rev3.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2rev3.apply(this, arguments as any);
             };
         },
     },
     lyra2re: {
         multiplier: Math.pow(2, 7),
         hash() {
-            return function () {
-                return multiHashing.lyra2re.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2re.apply(this, arguments as any);
             };
         },
     },
     lyra2re2: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.lyra2rev2.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2rev2.apply(this, arguments as any);
             };
         },
     },
     lyra2rev2: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function (data, nTimeInt) {
+            return function (data: Buffer, nTimeInt?: number) {
                 // For lyra2rev2, we need to handle nTimeInt parameter correctly
                 if (nTimeInt !== undefined) {
                     // Create a buffer with nTimeInt appended to data
@@ -333,25 +333,25 @@ const algos = (global.algos = {
     lyra2z: {
         multiplier: Math.pow(2, 8),
         hash() {
-            return function () {
-                return multiHashing.lyra2z.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.lyra2z.apply(this, arguments as any);
             };
         },
     },
     qubit: {
         hash() {
-            return function () {
-                return multiHashing.qubit.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.qubit.apply(this, arguments as any);
             };
         },
     },
     odo: {
-        hash(coinConfig) {
-            const odoKey = function (nTime) {
+        hash(coinConfig: any) {
+            const odoKey = function (nTime: number) {
                 return nTime - (nTime % coinConfig.shapechangeInterval);
             };
 
-            return function (data, nTime) {
+            return function (data: Buffer, nTime: number) {
                 return multiHashing.odo(data, odoKey(nTime));
             };
         },
@@ -360,8 +360,8 @@ const algos = (global.algos = {
         multiplier: 65536,
         diff: parseInt('0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         hash() {
-            return function () {
-                return multiHashing.yespower_0_5_R8.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_0_5_R8.apply(this, arguments as any);
             };
         },
     },
@@ -369,8 +369,8 @@ const algos = (global.algos = {
         multiplier: 65536,
         diff: parseInt('0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         hash() {
-            return function () {
-                return multiHashing.yespower_0_5_R8G.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_0_5_R8G.apply(this, arguments as any);
             };
         },
     },
@@ -378,8 +378,8 @@ const algos = (global.algos = {
         multiplier: 65536,
         diff: parseInt('0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         hash() {
-            return function () {
-                return multiHashing.yespower_0_5_R16.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_0_5_R16.apply(this, arguments as any);
             };
         },
     },
@@ -387,8 +387,8 @@ const algos = (global.algos = {
         multiplier: 65536,
         diff: parseInt('0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         hash() {
-            return function () {
-                return multiHashing.yespower_0_5_R24.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_0_5_R24.apply(this, arguments as any);
             };
         },
     },
@@ -396,35 +396,35 @@ const algos = (global.algos = {
         multiplier: 65536,
         diff: parseInt('0x0007ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
         hash() {
-            return function () {
-                return multiHashing.yespower_0_5_R32.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_0_5_R32.apply(this, arguments as any);
             };
         },
     },
     yespower: {
         multiplier: 65536,
         hash() {
-            return function () {
-                return multiHashing.yespower.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower.apply(this, arguments as any);
             };
         },
     },
     yespowerSUGAR: {
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nValue = coinConfig.nValue || 2048;
             const rValue = coinConfig.rValue || 32;
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.yespower_sugar(data, nValue, rValue);
             };
         },
     },
     yespowerLTNCG: {
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nValue = coinConfig.nValue || 2048;
             const rValue = coinConfig.rValue || 32;
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.yespower_ltncg(data, nValue, rValue);
             };
         },
@@ -432,25 +432,25 @@ const algos = (global.algos = {
     yespowerR16: {
         multiplier: 65536,
         hash() {
-            return function () {
-                return multiHashing.yespower_r16.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.yespower_r16.apply(this, arguments as any);
             };
         },
     },
     yespowerURX: {
         multiplier: Math.pow(2, 16),
-        hash(coinConfig) {
+        hash(coinConfig: any) {
             const nValue = coinConfig.nValue || 2048;
             const rValue = coinConfig.rValue || 32;
-            return function (data) {
+            return function (data: Buffer) {
                 return multiHashing.yespower_urx(data, nValue, rValue);
             };
         },
     },
     vipstar: {
         hash() {
-            return function () {
-                return multiHashing.vipstar.apply(this, arguments);
+            return function (this: any) {
+                return multiHashing.vipstar.apply(this, arguments as any);
             };
         },
     },

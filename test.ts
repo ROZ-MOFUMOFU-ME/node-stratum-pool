@@ -1,7 +1,7 @@
 import assert from 'node:assert';
-import * as stratumPool from './lib/index.js';
-import BlockTemplate from './lib/blockTemplate.js';
-import * as util from './lib/util.js';
+import * as stratumPool from './lib/index.ts';
+import BlockTemplate from './lib/blockTemplate.ts';
+import * as util from './lib/util.ts';
 
 console.log('Successfully imported stratum-pool module');
 
@@ -26,7 +26,7 @@ try {
         transactions: [{ data: data.toString('hex'), hash: fullHashBE, txid }],
     };
 
-    const sapling = new BlockTemplate(
+    const sapling = new (BlockTemplate as any)(
         '1',
         { ...baseRpc, version: 5, finalsaplingroothash: '22'.repeat(32) },
         poolScript,
@@ -42,7 +42,7 @@ try {
         'Sapling template must build merkle leaves from sha256d(full tx data), not txid'
     );
 
-    const bitcoinish = new BlockTemplate(
+    const bitcoinish = new (BlockTemplate as any)(
         '1',
         baseRpc, // no finalsaplingroothash
         poolScript,
@@ -58,7 +58,7 @@ try {
         'Non-Sapling template must keep building merkle leaves from txid'
     );
     console.log('merkle leaf selection (Sapling=hash, Bitcoin=txid) verified');
-} catch (e) {
+} catch (e: any) {
     console.error('Merkle leaf regression test failed:', e.message);
     process.exit(1);
 }
@@ -70,11 +70,18 @@ try {
         daemons: [],
         ports: {},
         rewardRecipients: {},
-        initStats: { difficulty: 1, connections: 0, networkHashRate: 0, stratumPorts: [] },
+        initStats: {
+            difficulty: 1,
+            connections: 0,
+            networkHashRate: 0,
+            stratumPorts: [],
+        },
     };
-    const pool = stratumPool.createPool(dummyOptions, () => ({ authorized: true }));
+    const pool = stratumPool.createPool(dummyOptions, () => ({
+        authorized: true,
+    }));
     console.log('createPool call successful:', typeof pool);
-} catch (e) {
+} catch (e: any) {
     console.error('Error in createPool call:', e.message);
     process.exit(1);
 }

@@ -1,6 +1,10 @@
-import * as util from './util.js';
+import * as util from './util.ts';
 
-const generateOutputTransactions = function (poolRecipient, recipients, rpcData) {
+const generateOutputTransactions = function (
+    poolRecipient: Buffer,
+    recipients: any,
+    rpcData: any
+): Buffer {
     let reward = rpcData.coinbasevalue;
     if (!reward) {
         reward = util.getKotoBlockSubsidy(rpcData.height);
@@ -11,7 +15,7 @@ const generateOutputTransactions = function (poolRecipient, recipients, rpcData)
 
     let rewardToPool = reward;
 
-    const txOutputBuffers = [];
+    const txOutputBuffers: Buffer[] = [];
 
     /* Dash 0.12.1/0.13 */
     if (rpcData.masternode) {
@@ -36,7 +40,7 @@ const generateOutputTransactions = function (poolRecipient, recipients, rpcData)
                 reward -= payeeReward;
                 rewardToPool -= payeeReward;
 
-                let payeeScript;
+                let payeeScript: Buffer;
 
                 if (rpcData.masternode[i].script) {
                     payeeScript = Buffer.from(rpcData.masternode[i].script, 'hex');
@@ -61,7 +65,7 @@ const generateOutputTransactions = function (poolRecipient, recipients, rpcData)
             reward -= payeeReward;
             rewardToPool -= payeeReward;
 
-            let payeeScript;
+            let payeeScript: Buffer;
 
             if (rpcData.superblock[i].script) {
                 payeeScript = Buffer.from(rpcData.superblock[i].script, 'hex');
@@ -173,13 +177,14 @@ const generateOutputTransactions = function (poolRecipient, recipients, rpcData)
 };
 
 export function CreateGeneration(
-    rpcData,
-    publicKey,
-    extraNoncePlaceholder,
-    reward,
-    txMessages,
-    recipients
-) {
+    rpcData: any,
+    publicKey: any,
+    extraNoncePlaceholder: any,
+    reward: any,
+    txMessages: any,
+    recipients: any,
+    network?: any
+): [Buffer, Buffer] {
     const txInputsCount = 1;
     let txVersion;
     if (rpcData.Modified_Coinbase_txn0 && rpcData.Modified_Coinbase_txn1) {
@@ -191,7 +196,7 @@ export function CreateGeneration(
         txVersion = parseInt(util.reverseHex(rpcData.coinbasetxn.data.slice(0, 8)), 16); // tx version is first 4byte of coinbasetxn.data
     }
     let txType = 0;
-    let txExtraPayload;
+    let txExtraPayload: Buffer | undefined;
     const txLockTime = 0;
 
     if (rpcData.coinbase_payload && rpcData.coinbase_payload.length > 0) {

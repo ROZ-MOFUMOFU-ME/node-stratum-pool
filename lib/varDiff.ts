@@ -7,11 +7,11 @@ Vardiff ported from stratum-mining share-limiter
 
  */
 
-function RingBuffer(maxSize) {
-    let data = [];
+function RingBuffer(this: any, maxSize: number) {
+    let data: number[] = [];
     let cursor = 0;
     let isFull = false;
-    this.append = function (x) {
+    this.append = function (x: number) {
         if (isFull) {
             data[cursor] = x;
             cursor = (cursor + 1) % maxSize;
@@ -41,11 +41,11 @@ function RingBuffer(maxSize) {
 }
 
 // Truncate a number to a fixed amount of decimal places
-function toFixed(num, len) {
+function toFixed(num: number, len: number) {
     return parseFloat(num.toFixed(len));
 }
 
-const varDiff = function varDiff(port, varDiffOptions) {
+const varDiff = function varDiff(this: any, port: number, varDiffOptions: any) {
     const _this = this;
 
     //if (!varDiffOptions) return;
@@ -56,7 +56,7 @@ const varDiff = function varDiff(port, varDiffOptions) {
     const tMin = varDiffOptions.targetTime - variance;
     const tMax = varDiffOptions.targetTime + variance;
 
-    this.manageClient = function (client) {
+    this.manageClient = function (client: any) {
         const stratumPort = client.socket.localPort;
 
         if (stratumPort != port) {
@@ -64,9 +64,9 @@ const varDiff = function varDiff(port, varDiffOptions) {
         }
         const options = varDiffOptions;
 
-        let lastTs;
-        let lastRtc;
-        let timeBuffer;
+        let lastTs: number;
+        let lastRtc: number;
+        let timeBuffer: any;
 
         client.on('submit', function () {
             const ts = (Date.now() / 1000) | 0;
@@ -74,7 +74,7 @@ const varDiff = function varDiff(port, varDiffOptions) {
             if (!lastRtc) {
                 lastRtc = ts - options.retargetTime / 2;
                 lastTs = ts;
-                timeBuffer = new RingBuffer(bufferSize);
+                timeBuffer = new (RingBuffer as any)(bufferSize);
                 return;
             }
 
@@ -114,6 +114,6 @@ const varDiff = function varDiff(port, varDiffOptions) {
         });
     };
 };
-Object.setPrototypeOf(varDiff.prototype, events.EventEmitter.prototype);
+Object.setPrototypeOf((varDiff as any).prototype, events.EventEmitter.prototype);
 
 export default varDiff;

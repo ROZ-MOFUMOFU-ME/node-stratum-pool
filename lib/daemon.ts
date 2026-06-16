@@ -11,12 +11,12 @@ import async from 'async';
  * - 'password': password for the rpc interface of the coin
  **/
 
-function DaemonInterface(daemons, logger) {
+function DaemonInterface(this: any, daemons: any, logger: any) {
     //private members
     const _this = this;
     logger =
         logger ||
-        function (severity, message) {
+        function (severity: any, message: any) {
             console.log(`${severity}: ${message}`);
         };
 
@@ -24,24 +24,24 @@ function DaemonInterface(daemons, logger) {
         for (let i = 0; i < daemons.length; i++) {
             daemons[i]['index'] = i;
             if (daemons[i].maxSockets)
-                daemons[i].myagent = http.Agent({
+                daemons[i].myagent = (http.Agent as any)({
                     maxSockets: daemons[i].maxSockets,
                     keepAlive: false,
                 });
-            else daemons[i].myagent = http.Agent({ maxSockets: 16, keepAlive: false });
+            else daemons[i].myagent = (http.Agent as any)({ maxSockets: 16, keepAlive: false });
         }
         return daemons;
     })();
 
     function init() {
-        isOnline(function (online) {
+        isOnline(function (online: any) {
             if (online) _this.emit('online');
         });
     }
 
-    function isOnline(callback) {
-        cmd('ISONLINEIMPL', [], function (results) {
-            const allOnline = results.every(function (_result) {
+    function isOnline(callback: any) {
+        cmd('ISONLINEIMPL', [], function (results: any) {
+            const allOnline = results.every(function (_result: any) {
                 return !_result.error;
             });
             callback(allOnline);
@@ -49,7 +49,7 @@ function DaemonInterface(daemons, logger) {
         });
     }
 
-    function performHttpRequest(instance, jsonData, callback) {
+    function performHttpRequest(instance: any, jsonData: any, callback: any) {
         const options = {
             hostname: typeof instance.host === 'undefined' ? '127.0.0.1' : instance.host,
             port: instance.port,
@@ -61,7 +61,7 @@ function DaemonInterface(daemons, logger) {
             agent: instance.myagent,
         };
 
-        const parseJson = function (res, data) {
+        const parseJson = function (res: any, data: any) {
             let dataJson;
 
             if (res.statusCode === 401) {
@@ -87,10 +87,10 @@ function DaemonInterface(daemons, logger) {
             if (dataJson) callback(dataJson.error, dataJson, data);
         };
 
-        const req = http.request(options, function (res) {
+        const req = http.request(options, function (res: any) {
             let data = '';
             res.setEncoding('utf8');
-            res.on('data', function (chunk) {
+            res.on('data', function (chunk: any) {
                 data += chunk;
             });
             res.on('end', function () {
@@ -98,7 +98,7 @@ function DaemonInterface(daemons, logger) {
             });
         });
 
-        req.on('error', function (e) {
+        req.on('error', function (e: any) {
             if (e.code === 'ECONNREFUSED') callback({ type: 'offline', message: e.message }, null);
             else callback({ type: 'request error', message: e.message }, null);
         });
@@ -114,7 +114,7 @@ function DaemonInterface(daemons, logger) {
      ]
      */
 
-    function batchCmd(cmdArray, callback) {
+    function batchCmd(cmdArray: any, callback: any) {
         const requestJson = [];
 
         for (let i = 0; i < cmdArray.length; i++) {
@@ -127,7 +127,7 @@ function DaemonInterface(daemons, logger) {
 
         const serializedRequest = JSON.stringify(requestJson);
 
-        performHttpRequest(instances[0], serializedRequest, function (error, result) {
+        performHttpRequest(instances[0], serializedRequest, function (error: any, result: any) {
             callback(error, result);
         });
     }
@@ -135,14 +135,20 @@ function DaemonInterface(daemons, logger) {
     /* Sends a JSON RPC (http://json-rpc.org/wiki/specification) command to every configured daemon.
        The callback function is fired once with the result from each daemon unless streamResults is
        set to true. */
-    function cmd(method, params, callback, streamResults, returnRawData) {
-        const results = [];
+    function cmd(
+        method: any,
+        params: any,
+        callback: any,
+        streamResults?: any,
+        returnRawData?: any
+    ) {
+        const results: any[] = [];
 
         async.each(
             instances,
-            function (instance, eachCallback) {
-                let itemFinished = function (error, result, data) {
-                    const returnObj = {
+            function (instance: any, eachCallback: any) {
+                let itemFinished = function (error: any, result: any, data?: any) {
+                    const returnObj: any = {
                         error,
                         response: (result || {}).result,
                         instance,
@@ -173,9 +179,13 @@ function DaemonInterface(daemons, logger) {
                     id: Date.now() + Math.floor(Math.random() * 10),
                 });
 
-                performHttpRequest(instance, requestJson, function (error, result, data) {
-                    itemFinished(error, result, data);
-                });
+                performHttpRequest(
+                    instance,
+                    requestJson,
+                    function (error: any, result: any, data: any) {
+                        itemFinished(error, result, data);
+                    }
+                );
             },
             function () {
                 if (!streamResults) {
@@ -193,6 +203,6 @@ function DaemonInterface(daemons, logger) {
     this.batchCmd = batchCmd;
 }
 
-Object.setPrototypeOf(DaemonInterface.prototype, events.EventEmitter.prototype);
+Object.setPrototypeOf((DaemonInterface as any).prototype, events.EventEmitter.prototype);
 
 export default { interface: DaemonInterface };

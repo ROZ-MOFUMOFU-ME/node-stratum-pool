@@ -25,13 +25,14 @@
         "vekexasia",
         "TheSeven"
     ],
-    "main": "lib/index.js",
+    "main": "lib/index.ts",
     "scripts": {
-        "test": "node test.mjs",
-        "lint": "eslint lib/ test.mjs",
-        "lint:fix": "eslint lib/ test.mjs --fix",
-        "format": "prettier --write lib/ test.mjs eslint.config.js .prettierrc",
-        "format:check": "prettier --check lib/ test.mjs eslint.config.js .prettierrc"
+        "test": "node test.ts",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint lib/ test.ts",
+        "lint:fix": "eslint lib/ test.ts --fix",
+        "format": "prettier --write lib/ test.ts eslint.config.js",
+        "format:check": "prettier --check lib/ test.ts eslint.config.js"
     },
     "repository": {
         "type": "git",
@@ -45,9 +46,13 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@types/async": "^3.2.25",
+        "@types/node": "^25.9.3",
         "eslint": "^10.5.0",
         "eslint-config-prettier": "^10.1.8",
-        "prettier": "^3.8.4"
+        "prettier": "^3.8.4",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.61.1"
     },
     "overrides": {
         "flatted": "^3.4.2"

@@ -1,14 +1,14 @@
 import events from 'events';
 import crypto from 'crypto';
 
-import * as util from './util.js';
-import blockTemplate from './blockTemplate.js';
+import * as util from './util.ts';
+import blockTemplate from './blockTemplate.ts';
 
 // Import algos and diff1
-import algos, { diff1 } from './algoProperties.js';
+import algos, { diff1 } from './algoProperties.ts';
 
 // Unique extranonce per subscriber
-const ExtraNonceCounter = function (configInstanceId) {
+const ExtraNonceCounter = function (this: any, configInstanceId?: number) {
     const instanceId = configInstanceId || crypto.randomBytes(4).readUInt32LE(0);
     let counter = instanceId << 27;
 
@@ -21,10 +21,10 @@ const ExtraNonceCounter = function (configInstanceId) {
 };
 
 // Unique job per new block template
-const JobCounter = function () {
+const JobCounter = function (this: any) {
     let counter = 0;
 
-    this.next = function () {
+    this.next = function (this: any) {
         counter++;
         if (counter % 0xffff === 0) counter = 1;
         return this.cur();
@@ -40,14 +40,14 @@ const JobCounter = function () {
  * - newBlock(blockTemplate) - When a new block (previously unknown to the JobManager) is added, use this event to broadcast new jobs
  * - share(shareData, blockHex) - When a worker submits a share. It will have blockHex if a block was found
  **/
-const JobManager = function JobManager(options) {
+const JobManager = function JobManager(this: any, options: any) {
     const _this = this;
-    const jobCounter = new JobCounter();
-    const emitErrorLog = function (text) {
+    const jobCounter = new (JobCounter as any)();
+    const emitErrorLog = function (text: string) {
         _this.emit('log', 'error', text);
     };
 
-    this.extraNonceCounter = new ExtraNonceCounter(options.instanceId);
+    this.extraNonceCounter = new (ExtraNonceCounter as any)(options.instanceId);
     this.extraNoncePlaceholder = Buffer.from('f000000ff111111f', 'hex');
     this.extraNonce2Size = this.extraNoncePlaceholder.length - this.extraNonceCounter.size;
     this.currentJob;
@@ -68,7 +68,7 @@ const JobManager = function JobManager(options) {
         }
     })();
 
-    const blockHasher = (function () {
+    const blockHasher: any = (function () {
         switch (options.coin.algorithm) {
             case 'blake':
             case 'blake2s':
@@ -88,19 +88,19 @@ const JobManager = function JobManager(options) {
             case 'minotaur':
             case 'groestl':
             case 'groestlmyriad':
-                return function () {
-                    return util.reverseBuffer(util.sha256d.apply(this, arguments));
+                return function (this: any) {
+                    return util.reverseBuffer(util.sha256d.apply(this, arguments as any));
                 };
             case 'lyra2rev2':
-                return function () {
-                    return util.reverseBuffer(hashDigest.apply(this, arguments));
+                return function (this: any) {
+                    return util.reverseBuffer(hashDigest.apply(this, arguments as any));
                 };
             case 'scrypt':
             case 'scrypt-og':
             case 'scrypt-jane':
                 if (options.coin.reward === 'POS') {
-                    return function (_d) {
-                        return util.reverseBuffer(hashDigest.apply(this, arguments));
+                    return function (this: any, _d: any) {
+                        return util.reverseBuffer(hashDigest.apply(this, arguments as any));
                     };
                 }
                 break;
@@ -116,17 +116,17 @@ const JobManager = function JobManager(options) {
             // reuse that path so CheckBlockAccepted's getblock matches
             // eslint-disable-next-line no-fallthrough
             case 'vipstar':
-                return function (_d) {
+                return function (_d: any) {
                     return util.reverseBuffer(util.sha256d(_d));
                 };
             default:
-                return function () {
-                    return util.reverseBuffer(hashDigest.apply(this, arguments));
+                return function (this: any) {
+                    return util.reverseBuffer(hashDigest.apply(this, arguments as any));
                 };
         }
     })();
 
-    const getKotoFoundersReward = function (rpcData, recipients) {
+    const getKotoFoundersReward = function (rpcData: any, recipients: any) {
         if (!options.coin.kotoFoundersReward) {
             return recipients;
         }
@@ -152,8 +152,8 @@ const JobManager = function JobManager(options) {
         return founders.concat(recipients);
     };
 
-    this.updateCurrentJob = function (rpcData) {
-        const tmpBlockTemplate = new blockTemplate(
+    this.updateCurrentJob = function (rpcData: any) {
+        const tmpBlockTemplate = new (blockTemplate as any)(
             jobCounter.next(),
             rpcData,
             options.poolAddressScript,
@@ -170,7 +170,7 @@ const JobManager = function JobManager(options) {
     };
 
     // returns true if processed a new block
-    this.processTemplate = function (rpcData) {
+    this.processTemplate = function (this: any, rpcData: any) {
         /* Block is new if A) its the first block we have seen so far or B) the blockhash is different and the
            block height is greater than the one we have */
         let isNewBlock = typeof _this.currentJob === 'undefined';
@@ -186,7 +186,7 @@ const JobManager = function JobManager(options) {
 
         if (!isNewBlock) return false;
 
-        const tmpBlockTemplate = new blockTemplate(
+        const tmpBlockTemplate = new (blockTemplate as any)(
             jobCounter.next(),
             rpcData,
             options.poolAddressScript,
@@ -208,18 +208,19 @@ const JobManager = function JobManager(options) {
     };
 
     this.processShare = function (
-        jobId,
-        previousDifficulty,
-        difficulty,
-        extraNonce1,
-        extraNonce2,
-        nTime,
-        nonce,
-        ipAddress,
-        port,
-        workerName,
-        versionMask,
-        isSoloMining
+        this: any,
+        jobId: any,
+        previousDifficulty: any,
+        difficulty: any,
+        extraNonce1: any,
+        extraNonce2: any,
+        nTime: any,
+        nonce: any,
+        ipAddress: any,
+        port: any,
+        workerName: any,
+        versionMask: any,
+        isSoloMining: any
     ) {
         /*// --- Debug: print submitted values ---
         console.log('[DEBUG][processShare] jobId:', jobId);
@@ -229,7 +230,7 @@ const JobManager = function JobManager(options) {
         console.log('[DEBUG][processShare] nonce:', nonce);
         console.log('[DEBUG][processShare] versionMask:', versionMask);*/
 
-        const shareError = function (error) {
+        const shareError = function (error: any) {
             _this.emit('share', {
                 job: jobId,
                 ip: ipAddress,
@@ -316,9 +317,9 @@ const JobManager = function JobManager(options) {
             console.log(`[DEBUG] lyra2rev2 - shareDiff: ${shareDiff}`);
         }*/
 
-        let blockHashInvalid;
-        let blockHash;
-        let blockHex;
+        let blockHashInvalid: any;
+        let blockHash: any;
+        let blockHex: any;
 
         // Adjusted block difficulty for algorithm multiplier
         const blockDiffAdjusted = job.difficulty * Number(multiplier);
