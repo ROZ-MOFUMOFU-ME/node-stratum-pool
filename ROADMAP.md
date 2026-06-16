@@ -7,10 +7,14 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 
 ## Current state
 
+- Released **0.4.0** (latest tagged release; pre-releases tag from `develop`,
+  releases from `main`).
 - Buildless ESM/TypeScript library, Node `>=22` (Node 24 recommended): the
   `.ts` sources run directly via Node's native type stripping (no build step;
-  `tsc --noEmit` type-checks only). Linted with ESLint 9 + Prettier.
-- bitcoinjs-lib 7 for address/script handling.
+  `tsc --noEmit` type-checks only), with `src/index.ts` as the entry point
+  (`exports` also keeps a back-compat `./lib/*` → `./src/*` alias for
+  downstream deep imports). Linted with ESLint + Prettier.
+- bitcoinjs-lib 7 (plus `@exodus/bitcoinjs-lib-zcash`) for address/script handling.
 - **Verified algorithms** (mining → submitblock accepted): yescrypt family,
   yespower family (incl. yespowerSUGAR), yescryptR8G, lyra2rev2 (Monacoin),
   vipstar (VIPSTARCOIN, 181-byte qtum-style header), sha256d, quark, x11.
@@ -22,6 +26,10 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
   using `txid` corrupted the root and the daemon rejected any block carrying a
   shielded mempool tx with `CheckBlock(): hashMerkleRoot mismatch`. Blocks now
   pass the daemon's merkle check; Bitcoin/segwit chains still commit `txid`.
+- **Recent fix**: the invalid-share auto-ban path (`considerBan` in
+  `src/stratum.ts`) now resets the per-client share counters via the captured
+  `_this` instead of the closure's `this`, which had been `undefined` in the
+  callback and crashed the connection when the invalid-share threshold was hit.
 
 ## Known issues & limitations
 
