@@ -7,10 +7,9 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 
 ## Current state
 
-- ESM library, Node `^20.19 || >=22.12` (Node 24 recommended), linted with
-  ESLint 9 + Prettier. The `@exodus/crypto` transitive dep (via
-  `@exodus/bitcoinjs-lib-zcash`, used for Koto/Zcash addresses) is ESM loaded
-  through `require()`, so 20.0–20.18 / 22.0–22.11 fail with `ERR_REQUIRE_ESM`.
+- Buildless ESM/TypeScript library, Node `>=22` (Node 24 recommended): the
+  `.ts` sources run directly via Node's native type stripping (no build step;
+  `tsc --noEmit` type-checks only). Linted with ESLint 9 + Prettier.
 - bitcoinjs-lib 7 for address/script handling.
 - **Verified algorithms** (mining → submitblock accepted): yescrypt family,
   yespower family (incl. yespowerSUGAR), yescryptR8G, lyra2rev2 (Monacoin),
@@ -26,14 +25,15 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 
 ## Known issues & limitations
 
-- **Minimal test** — `test.mjs` imports the module, calls `createPool()`, and
-  asserts the per-chain merkle-leaf selection (Sapling=`hash`, Bitcoin=`txid`);
-  there is still no broader per-algorithm or protocol-level coverage.
+- **Minimal test** — `test/smoke.test.ts` (run via `node --test`) imports the
+  module, calls `createPool()`, and asserts the per-chain merkle-leaf selection
+  (Sapling=`hash`, Bitcoin=`txid`); there is still no broader per-algorithm or
+  protocol-level coverage.
 - Several algorithms in the README are marked "may work" / "not working" and
   are unverified against live daemons.
 - Coin-specific paths (Koto founders reward, Dash masternode/superblock
   payees, POS reward type) have no regression coverage.
-- `algoProperties.js` block-hash handling has repetitive per-algorithm
+- `src/algoProperties.ts` block-hash handling has repetitive per-algorithm
   branches that are easy to get subtly wrong (the vipstar/lyra2rev2 fixes
   were both block-hash issues; the Koto Sapling merkle-leaf fix was a related
   per-chain serialization issue, now guarded by a regression test).
@@ -67,10 +67,11 @@ depends on [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-ha
 - Refactor `algoProperties` so the block-hash function and difficulty
   multiplier are declared per algorithm in one place, reducing the
   duplicated `switch` branches in `jobManager`.
-- **TypeScript migration** — part of the stack-wide architecture
-  modernization (see the [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md));
-  typed pool options and RPC/job shapes would catch whole classes of bugs
-  (the vipstar/lyra2rev2 block-hash issues among them).
+- **Stronger typing** — the library is now buildless TypeScript (run via Node's
+  type stripping), but pool options and RPC/job shapes are still largely `any`;
+  tightening them would catch whole classes of bugs (the vipstar/lyra2rev2
+  block-hash issues among them). Part of the stack-wide architecture
+  modernization (see the [zny-nomp ROADMAP](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp/blob/main/ROADMAP.md)).
 - **Ethash-family support** — register `kawpow`/`ethash` (the addon already
   vendors the library) in `algoProperties`, and handle the Ethash job model:
   epoch / DAG / seedhash and the distinct `mining.notify` / `mining.submit`

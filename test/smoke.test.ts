@@ -1,16 +1,20 @@
 import assert from 'node:assert';
-import * as stratumPool from './lib/index.ts';
-import BlockTemplate from './lib/blockTemplate.ts';
-import * as util from './lib/util.ts';
+import { test } from 'node:test';
 
-console.log('Successfully imported stratum-pool module');
+import * as stratumPool from '../src/index.ts';
+import BlockTemplate from '../src/blockTemplate.ts';
+import * as util from '../src/util.ts';
+
+test('exposes the public API surface', () => {
+    assert.strictEqual(typeof stratumPool.createPool, 'function');
+});
 
 // Regression: block merkle leaves must use the right per-chain tx hash.
 // Zcash/Sapling chains (e.g. Koto) commit sha256d(full tx serialization)
 // (getblocktemplate `hash`) to the merkle root, which differs from `txid` for
 // shielded txs; Bitcoin/segwit chains commit `txid`. Picking the wrong field
 // makes the daemon reject blocks with "hashMerkleRoot mismatch".
-try {
+test('builds merkle leaves from the correct per-chain tx hash', () => {
     const poolScript = Buffer.alloc(25, 0x11); // dummy P2PKH-sized script
     const extraNoncePlaceholder = Buffer.from('f000000ff111111f', 'hex');
     const data = Buffer.from('abcdef0123456789', 'hex'); // arbitrary tx body
@@ -57,14 +61,9 @@ try {
         util.reverseBuffer(Buffer.from(txid, 'hex')).toString('hex'),
         'Non-Sapling template must keep building merkle leaves from txid'
     );
-    console.log('merkle leaf selection (Sapling=hash, Bitcoin=txid) verified');
-} catch (e: any) {
-    console.error('Merkle leaf regression test failed:', e.message);
-    process.exit(1);
-}
+});
 
-// Test createPool call (dummy configuration)
-try {
+test('createPool builds a pool from a dummy configuration', () => {
     const dummyOptions = {
         coin: { algorithm: 'sha256' },
         daemons: [],
@@ -80,11 +79,6 @@ try {
     const pool = stratumPool.createPool(dummyOptions, () => ({
         authorized: true,
     }));
-    console.log('createPool call successful:', typeof pool);
-} catch (e: any) {
-    console.error('Error in createPool call:', e.message);
-    process.exit(1);
-}
-
-console.log('All tests completed successfully');
-process.exit(0);
+    assert.strictEqual(typeof pool, 'object');
+    assert.ok(pool);
+});

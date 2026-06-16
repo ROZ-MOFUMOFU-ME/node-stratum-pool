@@ -5,7 +5,7 @@ pools, each with their own daemon and stratum port :)
 
 **Roadmap:** see [ROADMAP.md](ROADMAP.md) for current status, known issues, and planned improvements.
 
-[![CI](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/node.js.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/node.js.yml)&nbsp;[![Lint](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/lint-format.yml?branch=main&style=flat-square&logo=prettier&logoColor=white&label=lint)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/lint-format.yml)&nbsp;[![CircleCI](https://img.shields.io/circleci/build/github/ROZ-MOFUMOFU-ME/node-stratum-pool/main?style=flat-square&logo=circleci&label=CircleCI)](https://circleci.com/gh/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/main)&nbsp;[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://www.javascript.com/)&nbsp;[![Node.js](https://img.shields.io/badge/node-%E2%89%A520-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)&nbsp;[![Bitcoin](https://img.shields.io/badge/Bitcoin-F7931A?style=flat-square&logo=bitcoin&logoColor=white)](https://bitcoin.org/)&nbsp;[![License](https://img.shields.io/badge/license-GPLv2-blue?style=flat-square)](https://opensource.org/licenses/GPL-2.0)&nbsp;[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
+[![CI](https://img.shields.io/github/actions/workflow/status/ROZ-MOFUMOFU-ME/node-stratum-pool/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/actions/workflows/ci.yml)&nbsp;[![Release](https://img.shields.io/github/v/tag/ROZ-MOFUMOFU-ME/node-stratum-pool?include_prereleases&sort=semver&style=flat-square&logo=github&logoColor=white&label=release)](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/tags)&nbsp;[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)&nbsp;[![Code style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4?style=flat-square&logo=prettier&logoColor=white)](https://prettier.io/)&nbsp;[![Node.js](https://img.shields.io/badge/node-%E2%89%A522-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)&nbsp;[![Bitcoin](https://img.shields.io/badge/Bitcoin-F7931A?style=flat-square&logo=bitcoin&logoColor=white)](https://bitcoin.org/)&nbsp;[![License](https://img.shields.io/badge/license-GPLv2-blue?style=flat-square)](https://opensource.org/licenses/GPL-2.0)&nbsp;[![Discord](https://img.shields.io/badge/Discord-join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/zHUdQy2NzU)
 
 ### Community
 
@@ -81,7 +81,7 @@ Not working currently:
 
 ## Requirements
 
-- Node.js v20+ (tested on Node 20, 22 and 24; v20.17+/22+ is required because the bitcoinjs-lib dependency chain loads an ESM-only module via `require(esm)`)
+- Node.js v22+ (tested on Node 22 and 24): the library runs as buildless TypeScript via Node's native type stripping, which is enabled by default on Node 22.18+/24
 - coin daemon (preferably one with a relatively updated API and not some crapcoin :p)
 - a C/C++ toolchain with C++20 support (gcc 10+), required to build the [multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) native addon
 
@@ -93,7 +93,7 @@ Not working currently:
 npm install git+https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool.git#main
 ```
 
-Development happens on the `main` branch, together with the sibling repositories [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) (hashing addon) and [zny-nomp](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp) (mining portal). This `main` branch is protected, so changes land via pull request.
+Development happens on the `develop` branch; `main` is for releases/pre-releases and is protected, so changes land via pull request. This library is developed alongside the sibling repositories [node-multi-hashing](https://github.com/ROZ-MOFUMOFU-ME/node-multi-hashing) (hashing addon) and [zny-nomp](https://github.com/ROZ-MOFUMOFU-ME/zny-nomp) (mining portal); consumers install the release version via `#main`.
 
 #### Module usage
 
@@ -103,7 +103,7 @@ Possible options for `algorithm`: _sha256, scrypt, scrypt-jane, scrypt-n, quark,
 skein, groestl, fugue, shavite3, hefty1, or qubit_.
 
 ```javascript
-var myCoin = {
+const myCoin = {
     "name": "Dogecoin",
     "symbol": "DOGE",
     "algorithm": "scrypt",
@@ -123,7 +123,7 @@ var myCoin = {
 If you are using the `scrypt-jane` algorithm there are additional configurations:
 
 ```javascript
-var myCoin = {
+const myCoin = {
     name: 'Freecoin',
     symbol: 'FEC',
     algorithm: 'scrypt-jane',
@@ -136,7 +136,7 @@ var myCoin = {
 If you are using the `scrypt-n` algorithm there is an additional configuration:
 
 ```javascript
-var myCoin = {
+const myCoin = {
     name: 'Execoin',
     symbol: 'EXE',
     algorithm: 'scrypt-n',
@@ -159,7 +159,7 @@ If you are using the `keccak` algorithm there are additional configurations _(Th
 such as Copperlark and eCoin don't appear to work yet - only the popular ones like Maxcoin are)_:
 
 ```javascript
-var myCoin = {
+const myCoin = {
     name: 'eCoin',
     symbol: 'ECN',
     algorithm: 'keccak',
@@ -173,9 +173,9 @@ var myCoin = {
 Create and start new pool with configuration options and authentication function
 
 ```javascript
-var Stratum = require('stratum-pool');
+import * as Stratum from 'stratum-pool';
 
-var pool = Stratum.createPool(
+const pool = Stratum.createPool(
     {
         coin: myCoin,
 
@@ -425,6 +425,10 @@ npm run format
 
 # Check code quality with ESLint
 npm run lint
+
+# Type-check (no emit) and run the test suite
+npm run typecheck
+npm test
 ```
 
 ---

@@ -25,14 +25,24 @@
         "vekexasia",
         "TheSeven"
     ],
-    "main": "lib/index.ts",
+    "main": "src/index.ts",
+    "exports": {
+        ".": "./src/index.ts",
+        "./lib/*": "./src/*",
+        "./src/*": "./src/*",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "src",
+        "types"
+    ],
     "scripts": {
-        "test": "node test.ts",
+        "test": "node --test --test-force-exit",
         "typecheck": "tsc --noEmit",
-        "lint": "eslint lib/ test.ts",
-        "lint:fix": "eslint lib/ test.ts --fix",
-        "format": "prettier --write lib/ test.ts eslint.config.js",
-        "format:check": "prettier --check lib/ test.ts eslint.config.js"
+        "lint": "eslint src/ test/",
+        "lint:fix": "eslint src/ test/ --fix",
+        "format": "prettier --write src/ test/ eslint.config.js",
+        "format:check": "prettier --check src/ test/ eslint.config.js"
     },
     "repository": {
         "type": "git",
@@ -58,7 +68,7 @@
         "flatted": "^3.4.2"
     },
     "engines": {
-        "node": "^20.19.0 || >=22.12.0",
+        "node": ">=22",
         "npm": ">=9"
     }
 }
