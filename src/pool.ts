@@ -230,6 +230,25 @@ const pool = function pool(this: any, options: any, authorizeFn: any) {
             return;
         }
 
+        // The Peer constructor does Buffer.from(magic, 'hex').readUInt32LE(0),
+        // which needs exactly 4 bytes (8 hex chars). A malformed coin-config
+        // magic (wrong length / odd nibble) would otherwise throw
+        // ERR_BUFFER_OUT_OF_BOUNDS and crash the whole worker. Degrade to
+        // "p2p off, keep mining" instead of killing the process.
+        const activeMagic = options.testnet
+            ? options.coin.peerMagicTestnet
+            : options.coin.peerMagic;
+        if (!/^[0-9a-fA-F]{8}$/.test(String(activeMagic))) {
+            emitErrorLog(
+                'p2p disabled: ' +
+                    (options.testnet ? 'peerMagicTestnet' : 'peerMagic') +
+                    ' "' +
+                    activeMagic +
+                    '" must be exactly 4 bytes (8 hex chars) — block detection falls back to polling'
+            );
+            return;
+        }
+
         _this.peer = new (peer as any)(options);
         _this.peer
             .on('connected', function () {
