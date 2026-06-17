@@ -111,9 +111,12 @@ const JobManager = function JobManager(this: any, options: any) {
             case 'yespowerLTNCG':
             case 'yescryptR16':
             case 'yespowerR16':
-            // vipstar (VIPSTARCOIN) hashes a swapped 181-byte header for PoW,
-            // but the block identifier is the plain sha256d of the header;
-            // reuse that path so CheckBlockAccepted's getblock matches
+            // vipstar (VIPSTARCOIN): both the PoW hash (algoProperties) and the
+            // block IDENTIFIER hash are sha256d of the full 181-byte qtum-style
+            // header — they're literally the same hash. Daemons compute
+            // CBlockHeader::GetHash via standard sha256d over the serialized
+            // header (incl. hashStateRoot/hashUTXORoot/prevoutStake), so
+            // submitblock's getblock lookup matches.
             // eslint-disable-next-line no-fallthrough
             case 'vipstar':
                 return function (_d: any) {

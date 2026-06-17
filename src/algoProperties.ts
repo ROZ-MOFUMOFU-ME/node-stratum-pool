@@ -449,8 +449,19 @@ const algos: any = ((global as any).algos = {
     },
     vipstar: {
         hash() {
-            return function (this: any) {
-                return multiHashing.vipstar.apply(this, arguments as any);
+            return function (this: any, data: Buffer) {
+                // VIPSTARCOIN's daemon validates PoW as standard sha256d
+                // over the FULL qtum-style serialized block header — the
+                // 80-byte bitcoin part PLUS hashstateroot + hashutxoroot +
+                // prevoutStake + the (empty) vchBlockSig length byte (181
+                // bytes total). Verified against block.GetHash() of an
+                // actual daemon-produced PoW block: sha256d(headerBuffer)
+                // matches the stored block hash exactly. The earlier
+                // multiHashing.vipstar binding (cpuminer's sha256d_181_swap)
+                // expects pre-byte-swapped cpuminer-style pdata, not the
+                // canonical wire bytes serializeHeader produces, which is
+                // what made every share read as shareDiff=0 before.
+                return util.sha256d(data);
             };
         },
     },
