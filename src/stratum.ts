@@ -1130,7 +1130,12 @@ const StratumServer = function StratumServer(this: any, options: any, authorizeF
         Object.keys(options.ports).forEach(function (port) {
             net.createServer({ allowHalfOpen: false }, function (socket) {
                 _this.handleNewClient(socket);
-            }).listen(parseInt(port), function () {
+                // Bind IPv4 (0.0.0.0) explicitly. With host omitted, Node may
+                // bind IPv6-only (::) on some platforms (e.g. Node 24 on WSL2),
+                // silently refusing IPv4 miners — and WSL2's localhost
+                // forwarding only reaches IPv4 listeners. 0.0.0.0 keeps every
+                // miner (ccminer/cpuminer over 127.0.0.1 or a real IPv4) working.
+            }).listen(parseInt(port), '0.0.0.0', function () {
                 serversStarted++;
                 if (serversStarted == Object.keys(options.ports).length) _this.emit('started');
             });
