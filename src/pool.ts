@@ -137,6 +137,7 @@ const pool = function pool(this: any, options: any, authorizeFn: any) {
             `Network Hash Rate:\t${util.getReadableHashRateString(options.initStats.networkHashRate)}`,
             `Stratum Port(s):\t${_this.options.initStats.stratumPorts.join(', ')}`,
             `Pool Fee Percent:\t${_this.options.feePercent}%`,
+            `Payment Mode:\t\t${(options.paymentProcessing && options.paymentProcessing.paymentMode) || 'prop'}`,
             `ASICBoost Enabled:\t${options.coin.version_mask ? 'true' : 'false'}`,
         ];
 
