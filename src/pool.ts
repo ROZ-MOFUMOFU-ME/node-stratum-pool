@@ -330,6 +330,21 @@ const pool = function pool(this: any, options: any, authorizeFn: any) {
                     // "rejected", "high-hash", "duplicate", "bad-txnmrklroot").
                     // Surface the actual reason instead of silently treating any
                     // non-"rejected" response as a successful submission.
+                    //
+                    // Exception: "inconclusive". PoW/PoS hybrid daemons (e.g.
+                    // VIPSTARCOIN) return "inconclusive" for a block that was in
+                    // fact accepted onto the chain — the block frequently arrives
+                    // via p2p before submitblock can decide the best chain. Don't
+                    // treat that as a hard rejection: fall through to the
+                    // authoritative getblock check (CheckBlockAccepted) below,
+                    // which records the block only if it is actually on-chain (so
+                    // genuinely stale candidates are still discarded).
+                    if (String(result.response).toLowerCase().includes('inconclusive')) {
+                        emitLog(
+                            `Daemon instance ${result.instance.index} returned "inconclusive" for ${rpcCommand}; verifying via getblock`
+                        );
+                        continue;
+                    }
                     emitErrorLog(
                         `Daemon instance ${result.instance.index} rejected a supposedly valid block with ${rpcCommand}: ${JSON.stringify(
                             result.response
