@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import * as stratumPool from './lib/index.js';
 import BlockTemplate from './lib/blockTemplate.js';
+import JobManager from './lib/jobManager.js';
 import * as util from './lib/util.js';
 
 console.log('Successfully imported stratum-pool module');
@@ -76,6 +77,68 @@ try {
     console.log('createPool call successful:', typeof pool);
 } catch (e) {
     console.error('Error in createPool call:', e.message);
+    process.exit(1);
+}
+
+// Regression: VIPSTARCOIN / HTMLcoin (qtum-style) jobs carry hashstateroot +
+// hashutxoroot in the 181-byte header. If getblocktemplate returns a template
+// without them (a daemon hiccup / partial template), the pool must NOT broadcast
+// it — getJobParams() would silently fall back to a plain 80-byte job that the
+// canonical miner (ccminer -a vipstar) can't reconstruct, so every share is
+// rejected. The pool should skip it and wait for the next complete template.
+try {
+    const poolAddressScript = Buffer.alloc(25, 0x11);
+    const rpcBase = {
+        bits: '1e0fffff',
+        previousblockhash: '00'.repeat(32),
+        height: 100,
+        coinbasevalue: 5000000000,
+        transactions: [{ data: 'abcdef0123456789', txid: 'aa'.repeat(32) }],
+    };
+    const makeManager = (algorithm) => {
+        const jm = new JobManager({
+            instanceId: 1,
+            coin: { algorithm },
+            poolAddressScript,
+            recipients: [],
+            network: undefined,
+        });
+        const ev = { newBlocks: 0, errors: [] };
+        jm.on('newBlock', () => ev.newBlocks++);
+        jm.on('log', (level, msg) => {
+            if (level === 'error') ev.errors.push(msg);
+        });
+        return { jm, ev };
+    };
+
+    // vipstar + missing roots => refused, nothing broadcast, reason logged
+    const missing = makeManager('vipstar');
+    assert.strictEqual(missing.jm.processTemplate({ ...rpcBase }), false);
+    assert.strictEqual(missing.ev.newBlocks, 0);
+    assert.ok(
+        missing.ev.errors.some((m) => /hashstateroot/i.test(m)),
+        'should log why the vipstar template was skipped'
+    );
+
+    // vipstar + both roots => broadcast as a new block
+    const complete = makeManager('vipstar');
+    assert.strictEqual(
+        complete.jm.processTemplate({
+            ...rpcBase,
+            hashstateroot: '11'.repeat(32),
+            hashutxoroot: '22'.repeat(32),
+        }),
+        true
+    );
+    assert.strictEqual(complete.ev.newBlocks, 1);
+
+    // non-vipstar coins are unaffected: a root-less template still broadcasts
+    const other = makeManager('sha256');
+    assert.strictEqual(other.jm.processTemplate({ ...rpcBase }), true);
+    assert.strictEqual(other.ev.newBlocks, 1);
+    console.log('vipstar root-guard (skip root-less template) verified');
+} catch (e) {
+    console.error('vipstar root-guard regression test failed:', e.message);
     process.exit(1);
 }
 
