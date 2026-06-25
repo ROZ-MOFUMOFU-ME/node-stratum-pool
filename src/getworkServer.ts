@@ -1,7 +1,7 @@
 import http from 'http';
 import https from 'https';
-import fs from 'fs';
 import * as util from './util.ts';
+import { buildTlsServerOptions } from './tlsUtil.ts';
 
 /*
  * VIPSTARCOIN / qtum getwork bridge.
@@ -216,30 +216,24 @@ const GetworkServer = function (
     }
 
     this.start = function () {
-        // Opt-in only (getwork is just for qtum-family coins like vipstar). Disabled unless
-        // options.getwork.enabled is true.
+        // Opt-in only (getwork is just for qtum-family coins like vipstar).
         if (!cfg.enabled) return;
-        const tlsOpts = options.tlsOptions || {};
+        let tlsServerOptions: any; // built lazily on the first tls:true port, then shared
         Object.keys(ports).forEach(function (portStr) {
             const portNum = parseInt(portStr);
             const portCfg = ports[portStr] || {};
             const handler = makeHandler(portNum, portCfg);
             let server: any;
             if (portCfg.tls) {
-                if (!tlsOpts.serverKey || !tlsOpts.serverCert) {
+                if (tlsServerOptions === undefined)
+                    tlsServerOptions = buildTlsServerOptions(options.tlsOptions);
+                if (!tlsServerOptions) {
                     emitErrorLog(
-                        `Getwork port ${portStr} requests TLS but tlsOptions.serverKey/serverCert are not set; skipping`
+                        `Getwork port ${portStr} has tls:true but the key/cert is missing or unreadable; skipping`
                     );
                     return;
                 }
-                server = https.createServer(
-                    {
-                        key: fs.readFileSync(tlsOpts.serverKey),
-                        cert: fs.readFileSync(tlsOpts.serverCert),
-                        ca: tlsOpts.ca ? fs.readFileSync(tlsOpts.ca) : undefined,
-                    },
-                    handler
-                );
+                server = https.createServer(tlsServerOptions, handler);
             } else {
                 server = http.createServer(handler);
             }

@@ -1,8 +1,9 @@
 import https from 'https';
 import net from 'net';
 import tls from 'tls';
-import fs from 'fs';
 import events from 'events';
+
+import { buildTlsServerOptions } from './tlsUtil.ts';
 
 import * as util from './util.ts';
 
@@ -1130,8 +1131,7 @@ const StratumServer = function StratumServer(this: any, options: any, authorizeF
 
         let serversStarted = 0;
         const portKeys = Object.keys(options.ports);
-        const tlsOpts = options.tlsOptions || {};
-        let tlsServerOptions: any = null;
+        let tlsServerOptions: any; // built lazily on the first tls:true port, then shared
         const markStarted = function () {
             serversStarted++;
             if (serversStarted == portKeys.length) _this.emit('started');
@@ -1150,24 +1150,11 @@ const StratumServer = function StratumServer(this: any, options: any, authorizeF
             // downgrading to plaintext — a plaintext fallback would leak the worker
             // credentials that clients send expecting an encrypted channel.
             if (portCfg.tls) {
-                if (!tlsOpts.serverKey || !tlsOpts.serverCert) {
+                if (tlsServerOptions === undefined)
+                    tlsServerOptions = buildTlsServerOptions(options.tlsOptions);
+                if (!tlsServerOptions) {
                     console.error(
-                        `Stratum port ${port} has tls:true but tlsOptions.serverKey/serverCert are not set; refusing to open it (no plaintext fallback).`
-                    );
-                    markStarted();
-                    return;
-                }
-                try {
-                    if (!tlsServerOptions) {
-                        tlsServerOptions = {
-                            key: fs.readFileSync(tlsOpts.serverKey),
-                            cert: fs.readFileSync(tlsOpts.serverCert),
-                            ca: tlsOpts.ca ? fs.readFileSync(tlsOpts.ca) : undefined,
-                        };
-                    }
-                } catch (e) {
-                    console.error(
-                        `Stratum port ${port} has tls:true but the key/cert could not be read (${e}); refusing to open it (no plaintext fallback).`
+                        `Stratum port ${port} has tls:true but the key/cert is missing or unreadable; refusing to open it (no plaintext fallback).`
                     );
                     markStarted();
                     return;
