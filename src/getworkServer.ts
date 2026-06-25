@@ -87,7 +87,7 @@ const GetworkServer = function (
     jobManager: any,
     options: any,
     authorizeFn: any,
-    emitLog: any,
+    _emitLog: any,
     emitErrorLog: any
 ) {
     const cfg = options.getwork || {};
@@ -243,11 +243,9 @@ const GetworkServer = function (
             } else {
                 server = http.createServer(handler);
             }
-            server.listen(portNum, '0.0.0.0', function () {
-                emitLog(
-                    `Getwork (HTTP${portCfg.tls ? 'S' : ''}) server started on port ${portStr}`
-                );
-            });
+            // No per-port log here — the pool startup summary lists the getwork ports
+            // alongside the stratum ports (see pool.ts infoLines).
+            server.listen(portNum, '0.0.0.0');
         });
     };
 };
