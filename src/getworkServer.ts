@@ -100,6 +100,10 @@ const GetworkServer = function (
     // Per-worker session: stable extraNonce1 (so coinbase/merkleRoot is reproducible at submit),
     // current difficulty and optional vardiff state.
     const sessions: any = {};
+    // getwork is HTTP-polling, so a miner re-sends Basic auth on every work fetch. Authorize
+    // each worker once and remember it, so authorizeFn (and its "Authorized" log line) runs
+    // once per worker — like stratum's connect — instead of on every poll.
+    const authorizedWorkers = new Set<string>();
 
     function sessionFor(worker: string, portCfg: any) {
         let s = sessions[worker];
@@ -159,6 +163,38 @@ const GetworkServer = function (
     }
 
     function makeHandler(portNum: number, portCfg: any) {
+        // Build and send the work/submit response for an already-authorized worker.
+        const respond = function (res: any, body: string, worker: string, ip: string) {
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('X-Roll-NTime', 'expire=120');
+            let reqId: any = 1;
+            let params: any[] = [];
+            let method = 'getwork';
+            try {
+                const j = JSON.parse(body);
+                reqId = j.id;
+                params = j.params || [];
+                method = j.method || 'getwork';
+            } catch {
+                /* empty/non-JSON body = work request */
+            }
+            let result: any = null;
+            try {
+                if (method !== 'getwork') {
+                    // ccminer probes getblocktemplate/getmininginfo; answer result:false with
+                    // no error so it stays in getwork mode (no "JSON-RPC call failed").
+                    result = false;
+                } else if (params.length === 0 || !params[0]) {
+                    result = getWork(worker, portCfg);
+                } else {
+                    result = submitWork(worker, params[0], ip, portNum);
+                }
+            } catch (e) {
+                emitErrorLog('getwork handler error: ' + e);
+            }
+            res.writeHead(200);
+            res.end(JSON.stringify({ result, error: null, id: reqId }));
+        };
         return function (req: any, res: any) {
             let body = '';
             req.on('data', (c: any) => (body += c));
@@ -169,10 +205,15 @@ const GetworkServer = function (
                 if (auth && auth.indexOf('Basic ') === 0) {
                     worker = Buffer.from(auth.slice(6), 'base64').toString().split(':')[0];
                 }
+                // Authorize a worker once, then cache it so getwork's per-poll requests don't
+                // re-run authorizeFn (and spam "Authorized") the way a fresh connect would.
+                if (authorizedWorkers.has(worker)) {
+                    respond(res, body, worker, ip);
+                    return;
+                }
                 authorizeFn(ip, portNum, worker, '', function (authResult: any) {
-                    res.setHeader('Content-Type', 'application/json');
-                    res.setHeader('X-Roll-NTime', 'expire=120');
                     if (!authResult || !authResult.authorized) {
+                        res.setHeader('Content-Type', 'application/json');
                         res.writeHead(401);
                         res.end(
                             JSON.stringify({
@@ -183,33 +224,8 @@ const GetworkServer = function (
                         );
                         return;
                     }
-                    let reqId: any = 1;
-                    let params: any[] = [];
-                    let method = 'getwork';
-                    try {
-                        const j = JSON.parse(body);
-                        reqId = j.id;
-                        params = j.params || [];
-                        method = j.method || 'getwork';
-                    } catch {
-                        /* empty/non-JSON body = work request */
-                    }
-                    let result: any = null;
-                    try {
-                        if (method !== 'getwork') {
-                            // ccminer probes getblocktemplate/getmininginfo; answer result:false with
-                            // no error so it stays in getwork mode (no "JSON-RPC call failed").
-                            result = false;
-                        } else if (params.length === 0 || !params[0]) {
-                            result = getWork(worker, portCfg);
-                        } else {
-                            result = submitWork(worker, params[0], ip, portNum);
-                        }
-                    } catch (e) {
-                        emitErrorLog('getwork handler error: ' + e);
-                    }
-                    res.writeHead(200);
-                    res.end(JSON.stringify({ result, error: null, id: reqId }));
+                    authorizedWorkers.add(worker);
+                    respond(res, body, worker, ip);
                 });
             });
         };
