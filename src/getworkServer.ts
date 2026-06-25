@@ -1,4 +1,6 @@
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import * as util from './util.ts';
 
 /*
@@ -13,11 +15,14 @@ import * as util from './util.ts';
  * so those miners can join the pool. The pool's coinbase (fee/payout) is preserved because we
  * build the work from jobManager.currentJob, not from the daemon's getwork.
  *
+ * It mirrors the stratum side: opt-in via options.getwork.enabled, multiple ports each with its
+ * own difficulty / TLS / vardiff. getwork is only needed for qtum-family coins (vipstar), so it
+ * stays disabled unless explicitly enabled.
+ *
  * data format (verified byte-for-byte against VIPSTARCOINd getwork):
  *   data = wordByteSwap( serializeHeader()'s 181-byte wire output ) + 11 zero bytes  (= 192B)
  *   wordByteSwap = reverse the 4 bytes of every 32-bit word (word order kept).
  *   This maps version 00000020<->20000000 and the qtum roots between the two encodings.
- *   target = little-endian network target (reverse of the big-endian rpcData.target hex).
  */
 
 function wordByteSwap(buf: Buffer): Buffer {
@@ -35,12 +40,46 @@ const GETWORK_PAD = Buffer.alloc(11, 0);
 
 const DIFF1 = BigInt('0x00000000ffff0000000000000000000000000000000000000000000000000000');
 
-// getwork target (little-endian) for a given pool share difficulty, so miners submit shares at
-// the pool's difficulty rather than only full blocks.
+// getwork target (little-endian) for a pool share difficulty, scaled by 1e8 so fractional
+// difficulties (vardiff) keep precision.
 function diffToTarget(diff: number): string {
-    const d = Math.max(1, Math.floor(diff));
-    const be = (DIFF1 / BigInt(d)).toString(16).padStart(64, '0');
+    const SCALE = 100000000n;
+    const d = BigInt(Math.max(1, Math.floor(diff * 1e8)));
+    const be = ((DIFF1 * SCALE) / d).toString(16).padStart(64, '0').slice(-64);
     return util.reverseBuffer(Buffer.from(be, 'hex')).toString('hex');
+}
+
+// Per-worker vardiff, mirroring varDiff.ts but driven by getwork submit cadence (no socket).
+function makeVardiff(opts: any, startDiff: number) {
+    const variance = opts.targetTime * (opts.variancePercent / 100);
+    return {
+        opts,
+        tMin: opts.targetTime - variance,
+        tMax: opts.targetTime + variance,
+        diff: startDiff,
+        lastTs: 0,
+        lastRetarget: 0,
+        times: [] as number[],
+    };
+}
+
+function vardiffOnSubmit(vd: any, nowSec: number) {
+    if (!vd.lastRetarget) {
+        vd.lastRetarget = nowSec - vd.opts.retargetTime / 2;
+        vd.lastTs = nowSec;
+        return;
+    }
+    vd.times.push(Math.max(1, nowSec - vd.lastTs));
+    vd.lastTs = nowSec;
+    if (nowSec - vd.lastRetarget < vd.opts.retargetTime || vd.times.length === 0) return;
+    vd.lastRetarget = nowSec;
+    const avg = vd.times.reduce((a: number, b: number) => a + b, 0) / vd.times.length;
+    vd.times = [];
+    if (avg > vd.tMax || avg < vd.tMin) {
+        let next = vd.diff * (vd.opts.targetTime / avg);
+        next = Math.max(vd.opts.minDiff || 0.01, Math.min(vd.opts.maxDiff || 1e9, next));
+        vd.diff = next;
+    }
 }
 
 const GetworkServer = function (
@@ -52,58 +91,63 @@ const GetworkServer = function (
     emitErrorLog: any
 ) {
     const cfg = options.getwork || {};
-    const port = cfg.port;
+    // Normalize to a ports map { "3340": { diff, tls, varDiff } }; accept a single-port shorthand
+    // ({ port, diff }) for backward compatibility.
+    const ports: any =
+        cfg.ports ||
+        (cfg.port ? { [String(cfg.port)]: { diff: cfg.diff, varDiff: cfg.varDiff } } : {});
 
-    // One session per worker name keeps a stable extraNonce1, so the coinbase (and therefore the
-    // merkleRoot) is reproducible when the same worker submits. extraNonce2 is fixed at zero
-    // (getwork miners only roll nonce + nTime).
+    // Per-worker session: stable extraNonce1 (so coinbase/merkleRoot is reproducible at submit),
+    // current difficulty and optional vardiff state.
     const sessions: any = {};
 
-    function sessionFor(worker: string) {
+    function sessionFor(worker: string, portCfg: any) {
         let s = sessions[worker];
         if (!s) {
-            s = { en1: jobManager.extraNonceCounter.next() };
+            const startDiff = portCfg.diff || 1;
+            s = {
+                en1: jobManager.extraNonceCounter.next(),
+                en2hex: Buffer.alloc(jobManager.extraNonce2Size, 0).toString('hex'),
+                diff: startDiff,
+                vd: portCfg.varDiff ? makeVardiff(portCfg.varDiff, startDiff) : null,
+            };
             sessions[worker] = s;
         }
         return s;
     }
 
-    function getWork(worker: string) {
+    function getWork(worker: string, portCfg: any) {
         const job = jobManager.currentJob;
         if (!job || !job.rpcData || !job.rpcData.target) return null;
-        const s = sessionFor(worker);
+        const s = sessionFor(worker, portCfg);
         // Fixed extraNonce1/2 per worker; the miner explores via nonce + rolled nTime (X-Roll-NTime
-        // header below), so the coinbase/merkleRoot stays stable and submits verify cleanly while
-        // each (nTime,nonce) pair is distinct (avoids "duplicate share").
-        const en2 = Buffer.alloc(jobManager.extraNonce2Size, 0);
-        s.en2hex = en2.toString('hex');
+        // header), so the merkleRoot stays stable and each (nTime,nonce) pair is distinct.
         const en1 = Buffer.from(s.en1, 'hex');
+        const en2 = Buffer.from(s.en2hex, 'hex');
         const built = jobManager.buildGetworkHeader(en1, en2);
         if (!built) return null;
         s.jobId = built.jobId;
         const data = Buffer.concat([wordByteSwap(built.headerLE), GETWORK_PAD]).toString('hex');
-        const target = diffToTarget(cfg.diff || 1);
-        return { data, target };
+        const diff = s.vd ? s.vd.diff : s.diff;
+        s.diff = diff;
+        return { data, target: diffToTarget(diff) };
     }
 
-    function submitWork(worker: string, dataHex: string, ip: string) {
+    function submitWork(worker: string, dataHex: string, ip: string, port: number) {
         const s = sessions[worker];
         if (!s || !s.jobId) return false;
         const wire = wordByteSwap(Buffer.from(dataHex, 'hex').subarray(0, 181));
-        // serializeHeader wire layout: version[0:4] prev[4:36] merkle[36:68]
-        //                              nTime[68:72] bits[72:76] nonce[76:80] roots...
-        // wire holds nTime/nonce little-endian; processShare/serializeHeader expect big-endian
-        // hex (same as stratum), so reverse each 4-byte field back.
+        // wire layout: version[0:4] prev[4:36] merkle[36:68] nTime[68:72] bits[72:76] nonce[76:80].
+        // wire is little-endian; processShare/serializeHeader want big-endian hex, so reverse each.
         const nTime = Buffer.from(wire.subarray(68, 72)).reverse().toString('hex');
         const nonce = Buffer.from(wire.subarray(76, 80)).reverse().toString('hex');
-        const en2hex = s.en2hex || Buffer.alloc(jobManager.extraNonce2Size, 0).toString('hex');
-        const diff = cfg.diff || 1;
+        if (s.vd) vardiffOnSubmit(s.vd, (Date.now() / 1000) | 0);
         jobManager.processShare(
             s.jobId,
             null,
-            diff,
+            s.diff,
             s.en1,
-            en2hex,
+            s.en2hex,
             nTime,
             nonce,
             ip,
@@ -114,9 +158,8 @@ const GetworkServer = function (
         return true;
     }
 
-    this.start = function () {
-        if (!port) return;
-        http.createServer(function (req: any, res: any) {
+    function makeHandler(portNum: number, portCfg: any) {
+        return function (req: any, res: any) {
             let body = '';
             req.on('data', (c: any) => (body += c));
             req.on('end', function () {
@@ -126,7 +169,7 @@ const GetworkServer = function (
                 if (auth && auth.indexOf('Basic ') === 0) {
                     worker = Buffer.from(auth.slice(6), 'base64').toString().split(':')[0];
                 }
-                authorizeFn(ip, port, worker, '', function (authResult: any) {
+                authorizeFn(ip, portNum, worker, '', function (authResult: any) {
                     res.setHeader('Content-Type', 'application/json');
                     res.setHeader('X-Roll-NTime', 'expire=120');
                     if (!authResult || !authResult.authorized) {
@@ -152,27 +195,59 @@ const GetworkServer = function (
                         /* empty/non-JSON body = work request */
                     }
                     let result: any = null;
-                    let rpcError: any = null;
                     try {
                         if (method !== 'getwork') {
                             // ccminer probes getblocktemplate/getmininginfo; answer result:false with
-                            // no error so it quietly stays in getwork mode (no "JSON-RPC call failed").
+                            // no error so it stays in getwork mode (no "JSON-RPC call failed").
                             result = false;
                         } else if (params.length === 0 || !params[0]) {
-                            result = getWork(worker);
+                            result = getWork(worker, portCfg);
                         } else {
-                            result = submitWork(worker, params[0], ip);
+                            result = submitWork(worker, params[0], ip, portNum);
                         }
                     } catch (e) {
                         emitErrorLog('getwork handler error: ' + e);
                     }
-                    const respBody = JSON.stringify({ result, error: rpcError, id: reqId });
                     res.writeHead(200);
-                    res.end(respBody);
+                    res.end(JSON.stringify({ result, error: null, id: reqId }));
                 });
             });
-        }).listen(port, function () {
-            emitLog('Getwork (HTTP) server started on port ' + port);
+        };
+    }
+
+    this.start = function () {
+        // Opt-in only (getwork is just for qtum-family coins like vipstar). Disabled unless
+        // options.getwork.enabled is true.
+        if (!cfg.enabled) return;
+        const tlsOpts = options.tlsOptions || {};
+        Object.keys(ports).forEach(function (portStr) {
+            const portNum = parseInt(portStr);
+            const portCfg = ports[portStr] || {};
+            const handler = makeHandler(portNum, portCfg);
+            let server: any;
+            if (portCfg.tls) {
+                if (!tlsOpts.serverKey || !tlsOpts.serverCert) {
+                    emitErrorLog(
+                        `Getwork port ${portStr} requests TLS but tlsOptions.serverKey/serverCert are not set; skipping`
+                    );
+                    return;
+                }
+                server = https.createServer(
+                    {
+                        key: fs.readFileSync(tlsOpts.serverKey),
+                        cert: fs.readFileSync(tlsOpts.serverCert),
+                        ca: tlsOpts.ca ? fs.readFileSync(tlsOpts.ca) : undefined,
+                    },
+                    handler
+                );
+            } else {
+                server = http.createServer(handler);
+            }
+            server.listen(portNum, '0.0.0.0', function () {
+                emitLog(
+                    `Getwork (HTTP${portCfg.tls ? 'S' : ''}) server started on port ${portStr}`
+                );
+            });
         });
     };
 };

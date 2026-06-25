@@ -692,12 +692,13 @@ const pool = function pool(this: any, options: any, authorizeFn: any) {
                     _this.jobManager.currentJob.getJobParams(),
                     _this.jobManager.currentJob.getOdoKey()
                 );
-                // getwork is HTTP/stateless-per-request, so run it on a single fork only —
-                // otherwise cluster load-balancing splits getwork() and submit() across forks
-                // and the per-worker extraNonce1 session is lost.
+                // getwork is opt-in (only qtum-family coins like vipstar need it) and HTTP/
+                // stateless-per-request, so run it on a single fork only — otherwise cluster
+                // load-balancing splits getwork() and submit() across forks and the per-worker
+                // extraNonce1 session is lost.
                 if (
                     options.getwork &&
-                    options.getwork.port &&
+                    options.getwork.enabled &&
                     (!process.env.forkId || process.env.forkId === '0')
                 ) {
                     _this.getworkServer = new (GetworkServer as any)(
