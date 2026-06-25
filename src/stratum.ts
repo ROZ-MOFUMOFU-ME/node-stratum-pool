@@ -1,5 +1,7 @@
 import https from 'https';
 import net from 'net';
+import tls from 'tls';
+import fs from 'fs';
 import events from 'events';
 
 import * as util from './util.ts';
@@ -1127,18 +1129,61 @@ const StratumServer = function StratumServer(this: any, options: any, authorizeF
         //SetupBroadcasting();
 
         let serversStarted = 0;
-        Object.keys(options.ports).forEach(function (port) {
-            net.createServer({ allowHalfOpen: false }, function (socket) {
-                _this.handleNewClient(socket);
-                // Bind IPv4 (0.0.0.0) explicitly. With host omitted, Node may
-                // bind IPv6-only (::) on some platforms (e.g. Node 24 on WSL2),
-                // silently refusing IPv4 miners — and WSL2's localhost
-                // forwarding only reaches IPv4 listeners. 0.0.0.0 keeps every
-                // miner (ccminer/cpuminer over 127.0.0.1 or a real IPv4) working.
-            }).listen(parseInt(port), '0.0.0.0', function () {
-                serversStarted++;
-                if (serversStarted == Object.keys(options.ports).length) _this.emit('started');
-            });
+        const portKeys = Object.keys(options.ports);
+        const tlsOpts = options.tlsOptions || {};
+        let tlsServerOptions: any = null;
+        const markStarted = function () {
+            serversStarted++;
+            if (serversStarted == portKeys.length) _this.emit('started');
+        };
+        // Bind IPv4 (0.0.0.0) explicitly. With host omitted, Node may bind IPv6-only
+        // (::) on some platforms (e.g. Node 24 on WSL2), silently refusing IPv4 miners —
+        // and WSL2's localhost forwarding only reaches IPv4 listeners. 0.0.0.0 keeps
+        // every miner (ccminer/cpuminer over 127.0.0.1 or a real IPv4) working.
+        const onConnect = function (socket: any) {
+            _this.handleNewClient(socket);
+        };
+        portKeys.forEach(function (port) {
+            const portCfg = options.ports[port] || {};
+            // A port declared tls:true MUST be served over TLS. If the cert/key is
+            // missing or unreadable we refuse to open the port rather than silently
+            // downgrading to plaintext — a plaintext fallback would leak the worker
+            // credentials that clients send expecting an encrypted channel.
+            if (portCfg.tls) {
+                if (!tlsOpts.serverKey || !tlsOpts.serverCert) {
+                    console.error(
+                        `Stratum port ${port} has tls:true but tlsOptions.serverKey/serverCert are not set; refusing to open it (no plaintext fallback).`
+                    );
+                    markStarted();
+                    return;
+                }
+                try {
+                    if (!tlsServerOptions) {
+                        tlsServerOptions = {
+                            key: fs.readFileSync(tlsOpts.serverKey),
+                            cert: fs.readFileSync(tlsOpts.serverCert),
+                            ca: tlsOpts.ca ? fs.readFileSync(tlsOpts.ca) : undefined,
+                        };
+                    }
+                } catch (e) {
+                    console.error(
+                        `Stratum port ${port} has tls:true but the key/cert could not be read (${e}); refusing to open it (no plaintext fallback).`
+                    );
+                    markStarted();
+                    return;
+                }
+                tls.createServer(tlsServerOptions, onConnect).listen(
+                    parseInt(port),
+                    '0.0.0.0',
+                    markStarted
+                );
+            } else {
+                net.createServer({ allowHalfOpen: false }, onConnect).listen(
+                    parseInt(port),
+                    '0.0.0.0',
+                    markStarted
+                );
+            }
         });
     })();
 
