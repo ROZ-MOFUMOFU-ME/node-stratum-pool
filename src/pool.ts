@@ -8,6 +8,7 @@ import { Server } from './stratum.ts';
 import jobManager from './jobManager.ts';
 import * as util from './util.ts';
 import algos from './algoProperties.ts';
+import GetworkServer from './getworkServer.ts';
 
 /*process.on('uncaughtException', function(err) {
     console.log(err.stack);
@@ -691,6 +692,23 @@ const pool = function pool(this: any, options: any, authorizeFn: any) {
                     _this.jobManager.currentJob.getJobParams(),
                     _this.jobManager.currentJob.getOdoKey()
                 );
+                // getwork is HTTP/stateless-per-request, so run it on a single fork only —
+                // otherwise cluster load-balancing splits getwork() and submit() across forks
+                // and the per-worker extraNonce1 session is lost.
+                if (
+                    options.getwork &&
+                    options.getwork.port &&
+                    (!process.env.forkId || process.env.forkId === '0')
+                ) {
+                    _this.getworkServer = new (GetworkServer as any)(
+                        _this.jobManager,
+                        options,
+                        authorizeFn,
+                        emitLog,
+                        emitErrorLog
+                    );
+                    _this.getworkServer.start();
+                }
                 finishedCallback();
             })
             .on('broadcastTimeout', function () {

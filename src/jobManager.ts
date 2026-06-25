@@ -235,6 +235,21 @@ const JobManager = function JobManager(this: any, options: any) {
         return true;
     };
 
+    // Build a getwork-style header for the current job using a fixed extraNonce1/2, reusing the
+    // exact coinbase->merkleRoot path as processShare so a getwork submit verifies identically.
+    this.buildGetworkHeader = function (en1Buffer: any, en2Buffer: any) {
+        const job = _this.currentJob;
+        if (!job) return null;
+        const coinbaseBuffer = job.serializeCoinbase(en1Buffer, en2Buffer);
+        const coinbaseHash = coinbaseHasher(coinbaseBuffer);
+        const merkleRoot = util
+            .reverseBuffer(job.merkleTree.withFirst(coinbaseHash))
+            .toString('hex');
+        const nTime = util.packUInt32BE(job.rpcData.curtime).toString('hex');
+        const headerLE = job.serializeHeader(merkleRoot, nTime, '00000000', undefined);
+        return { headerLE, jobId: job.jobId };
+    };
+
     this.processShare = function (
         this: any,
         jobId: any,
