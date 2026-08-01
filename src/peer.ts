@@ -2,18 +2,18 @@ import net from 'net';
 import crypto from 'crypto';
 import events from 'events';
 
-import * as util from './util.js';
+import * as util from './util.ts';
 
 //Example of p2p in node from TheSeven: http://paste.pm/e54.js
 
-const fixedLenStringBuffer = function (s, len) {
+const fixedLenStringBuffer = function (s: string, len: number): Buffer {
     const buff = Buffer.alloc(len);
     buff.fill(0);
     buff.write(s);
     return buff;
 };
 
-const commandStringBuffer = function (s) {
+const commandStringBuffer = function (s: string): Buffer {
     return fixedLenStringBuffer(s, 12);
 };
 
@@ -22,10 +22,15 @@ const commandStringBuffer = function (s) {
    - amount of bytes to read
    - preRead argument can be used to set start with an existing data buffer
    - callback returns 1) data buffer and 2) lopped/over-read data */
-const readFlowingBytes = function (stream, amount, preRead, callback) {
+const readFlowingBytes = function (
+    stream: any,
+    amount: number,
+    preRead: Buffer | null,
+    callback: (data: Buffer, lopped: Buffer | null) => void
+): void {
     let buff = preRead ? preRead : Buffer.alloc(0);
 
-    const readData = function (data) {
+    const readData = function (data: Buffer): void {
         buff = Buffer.concat([buff, data]);
         if (buff.length >= amount) {
             const returnData = buff.slice(0, amount);
@@ -37,9 +42,9 @@ const readFlowingBytes = function (stream, amount, preRead, callback) {
     readData(Buffer.alloc(0));
 };
 
-const Peer = function (options) {
+const Peer = function (this: any, options: any) {
     const _this = this;
-    let client;
+    let client: any;
     const magic = Buffer.from(
         options.testnet ? options.coin.peerMagicTestnet : options.coin.peerMagic,
         'hex'
@@ -66,7 +71,7 @@ const Peer = function (options) {
     //If protocol version is new enough, add do not relay transactions flag byte, outlined in BIP37
     //https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki#extensions-to-existing-messages
     const relayTransactions =
-        options.p2p.disableTransactions === true ? Buffer.from([false]) : Buffer.from([]);
+        options.p2p.disableTransactions === true ? Buffer.from([false] as any) : Buffer.from([]);
 
     const commands = {
         version: commandStringBuffer('version'),
@@ -97,7 +102,7 @@ const Peer = function (options) {
                 Connect();
             } else if (validConnectionConfig) _this.emit('connectionRejected');
         });
-        client.on('error', function (e) {
+        client.on('error', function (e: any) {
             if (e.code === 'ECONNREFUSED') {
                 validConnectionConfig = false;
                 _this.emit('connectionFailed');
@@ -107,9 +112,9 @@ const Peer = function (options) {
         SetupMessageParser(client);
     }
 
-    function SetupMessageParser(client) {
-        const beginReadingMessage = function (preRead) {
-            readFlowingBytes(client, 24, preRead, function (header, lopped) {
+    function SetupMessageParser(client: any) {
+        const beginReadingMessage = function (preRead: Buffer | null) {
+            readFlowingBytes(client, 24, preRead, function (header: Buffer, lopped: Buffer | null) {
                 const msgMagic = header.readUInt32LE(0);
                 if (msgMagic !== magicInt) {
                     _this.emit('error', 'bad magic number from peer');
@@ -126,15 +131,20 @@ const Peer = function (options) {
                 const msgCommand = header.slice(4, 16).toString();
                 const msgLength = header.readUInt32LE(16);
                 const msgChecksum = header.readUInt32LE(20);
-                readFlowingBytes(client, msgLength, lopped, function (payload, lopped) {
-                    if (util.sha256d(payload).readUInt32LE(0) !== msgChecksum) {
-                        _this.emit('error', 'bad payload - failed checksum');
-                        beginReadingMessage(null);
-                        return;
+                readFlowingBytes(
+                    client,
+                    msgLength,
+                    lopped,
+                    function (payload: Buffer, lopped: Buffer | null) {
+                        if (util.sha256d(payload).readUInt32LE(0) !== msgChecksum) {
+                            _this.emit('error', 'bad payload - failed checksum');
+                            beginReadingMessage(null);
+                            return;
+                        }
+                        HandleMessage(msgCommand, payload);
+                        beginReadingMessage(lopped);
                     }
-                    HandleMessage(msgCommand, payload);
-                    beginReadingMessage(lopped);
-                });
+                );
             });
         };
 
@@ -142,7 +152,7 @@ const Peer = function (options) {
     }
 
     //Parsing inv message https://en.bitcoin.it/wiki/Protocol_specification#inv
-    function HandleInv(payload) {
+    function HandleInv(payload: Buffer) {
         //sloppy varint decoding
         let count = payload.readUInt8(0);
         payload = payload.slice(1);
@@ -168,7 +178,7 @@ const Peer = function (options) {
         }
     }
 
-    function HandleMessage(command, payload) {
+    function HandleMessage(command: string, payload: Buffer) {
         _this.emit('peerMessage', { command, payload });
         switch (command) {
             case commands.inv.toString():
@@ -189,7 +199,7 @@ const Peer = function (options) {
     }
 
     //Message structure defined at: https://en.bitcoin.it/wiki/Protocol_specification#Message_structure
-    function SendMessage(command, payload) {
+    function SendMessage(command: Buffer, payload: Buffer) {
         const message = Buffer.concat([
             magic,
             command,
@@ -215,7 +225,7 @@ const Peer = function (options) {
         ]);
         SendMessage(commands.version, payload);
     }
-};
+} as any;
 
 Object.setPrototypeOf(Peer.prototype, events.EventEmitter.prototype);
 

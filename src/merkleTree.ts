@@ -4,19 +4,19 @@ Ported from https://github.com/slush0/stratum-mining/blob/master/lib/merkletree.
 
  */
 
-import * as util from './util.js';
+import * as util from './util.ts';
 
-const MerkleTree = function MerkleTree(data) {
-    function merkleJoin(h1, h2) {
+const MerkleTree = function MerkleTree(this: any, data: Buffer[]) {
+    function merkleJoin(h1: Buffer, h2: Buffer): Buffer {
         const joined = Buffer.concat([h1, h2]);
         const dhashed = util.sha256d(joined);
         return dhashed;
     }
 
-    function calculateSteps(data) {
-        let L = data;
-        const steps = [];
-        const PreL = [null];
+    function calculateSteps(data: Buffer[]): Buffer[] {
+        let L: any[] = data;
+        const steps: Buffer[] = [];
+        const PreL: any[] = [null];
         const StartL = 2;
         let Ll = L.length;
 
@@ -28,7 +28,7 @@ const MerkleTree = function MerkleTree(data) {
 
                 if (Ll % 2) L.push(L[L.length - 1]);
 
-                const Ld = [];
+                const Ld: any[] = [];
                 const r = util.range(StartL, Ll, 2);
                 r.forEach(function (i) {
                     Ld.push(merkleJoin(L[i], L[i + 1]));
@@ -44,8 +44,8 @@ const MerkleTree = function MerkleTree(data) {
     this.steps = calculateSteps(data);
 };
 MerkleTree.prototype = {
-    withFirst(f) {
-        this.steps.forEach(function (s) {
+    withFirst(f: any) {
+        this.steps.forEach(function (s: Buffer) {
             f = util.sha256d(Buffer.concat([f, s]));
         });
         return f;
