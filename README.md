@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> **Merged into [namp](https://github.com/ROZ-MOFUMOFU-ME/namp)** (NAMP — Node All-in-One Mining Portal). Development continues there as [`packages/stratum-pool`](https://github.com/ROZ-MOFUMOFU-ME/namp/tree/main/packages/stratum-pool) with full commit history. This repository is archived; the pre-TypeScript main survives as [`legacy-main`](https://github.com/ROZ-MOFUMOFU-ME/node-stratum-pool/tree/legacy-main).
+
 # node-stratum-pool
 
 High performance Stratum poolserver in Node.js. One instance of this software can startup and manage multiple coin
